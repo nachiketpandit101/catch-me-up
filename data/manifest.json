@@ -1,0 +1,20 @@
+{
+  "series": [
+    {
+      "id": "red-rising",
+      "title": "Red Rising",
+      "books": [
+        {
+          "bookNumber": 1,
+          "title": "Red Rising",
+          "path": "data/red-rising/red-rising-book1.md"
+        },
+        {
+          "bookNumber": 2,
+          "title": "Golden Son",
+          "path": "data/red-rising/golden-son-book2.md"
+        }
+      ]
+    }
+  ]
+}
