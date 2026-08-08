@@ -6,7 +6,7 @@ Spoiler-free book series catch-up assistant. Ask questions about a series; answe
 
 - Next.js (App Router) + TypeScript
 - Supabase Postgres + pgvector
-- Google Gemini (`text-embedding-004`, `gemini-2.0-flash`)
+- Google Gemini (`gemini-embedding-001`, `gemini-2.5-flash`)
 
 ## Setup
 
@@ -18,6 +18,7 @@ Spoiler-free book series catch-up assistant. Ask questions about a series; answe
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `GOOGLE_GENERATIVE_AI_API_KEY`
+   - `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`; avoid `gemini-2.0-flash` if free-tier limit is 0)
 5. Place book markdown under `data/` (see [`data/README.md`](data/README.md)).
 6. Install and ingest, then run the app:
 

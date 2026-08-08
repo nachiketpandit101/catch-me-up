@@ -86,17 +86,34 @@ export function ChatInterface() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let fullText = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
         setMessages((prev) =>
           prev.map((message) =>
             message.id === assistantId
               ? { ...message, content: message.content + chunk }
               : message,
           ),
+        );
+      }
+
+      if (!fullText.trim()) {
+        throw new Error(
+          "Empty reply from Gemini. Check API quota / GEMINI_CHAT_MODEL in .env (try gemini-2.5-flash).",
+        );
+      }
+
+      if (
+        fullText.includes("RESOURCE_EXHAUSTED") ||
+        fullText.includes("exceeded your current quota")
+      ) {
+        throw new Error(
+          `Gemini quota exceeded. Set GEMINI_CHAT_MODEL to a model with available quota (gemini-2.5-flash or gemini-3-flash-preview). See https://ai.dev/rate-limit`,
         );
       }
     } catch (err) {

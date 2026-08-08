@@ -1,4 +1,4 @@
-import { streamSpoilerFreeReply } from "@/lib/chat";
+import { getChatModelId, streamSpoilerFreeReply } from "@/lib/chat";
 import { getSpoilerFreeContext } from "@/lib/retrieval";
 import type { ChatRequestBody } from "@/lib/types";
 
@@ -36,6 +36,32 @@ function validateBody(body: unknown): ChatRequestBody {
   };
 }
 
+function formatApiError(error: unknown): { message: string; status: number } {
+  const raw =
+    error instanceof Error ? error.message : "Unexpected server error";
+
+  if (
+    raw.includes("RESOURCE_EXHAUSTED") ||
+    raw.includes("exceeded your current quota") ||
+    raw.includes("429")
+  ) {
+    return {
+      status: 429,
+      message: `Gemini API quota exceeded for model "${getChatModelId()}". Free-tier limit for this model may be 0. Set GEMINI_CHAT_MODEL in .env to a model with available quota (e.g. gemini-2.5-flash or gemini-3-flash-preview), wait for the retry window, or enable API billing in AI Studio. See https://ai.dev/rate-limit`,
+    };
+  }
+
+  const status =
+    raw.startsWith("prompt") ||
+    raw.startsWith("seriesId") ||
+    raw.startsWith("maxBookProgress") ||
+    raw.startsWith("Request body")
+      ? 400
+      : 500;
+
+  return { message: raw, status };
+}
+
 export async function POST(request: Request) {
   try {
     const json = await request.json();
@@ -55,15 +81,7 @@ export async function POST(request: Request) {
 
     return result.toTextStreamResponse();
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unexpected server error";
-    const status = message.startsWith("prompt") ||
-      message.startsWith("seriesId") ||
-      message.startsWith("maxBookProgress") ||
-      message.startsWith("Request body")
-      ? 400
-      : 500;
-
+    const { message, status } = formatApiError(error);
     return Response.json({ error: message }, { status });
   }
 }

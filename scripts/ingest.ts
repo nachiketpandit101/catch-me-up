@@ -70,7 +70,10 @@ async function ingestBook(
     return;
   }
 
-  console.log("  Generating embeddings with text-embedding-004...");
+  console.log("  Generating embeddings with gemini-embedding-001...");
+  console.log(
+    "  (Slow paced for free-tier quotas; 429s will auto-retry with backoff.)",
+  );
   const embeddings = await generateEmbeddingsBatch(
     chunks.map((c) => c.content),
   );

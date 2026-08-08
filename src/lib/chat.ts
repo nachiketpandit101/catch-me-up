@@ -2,7 +2,9 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
 import type { BookChunk } from "@/lib/types";
 
-const CHAT_MODEL = "gemini-2.0-flash";
+export function getChatModelId(): string {
+  return process.env.GEMINI_CHAT_MODEL?.trim() || "gemini-2.5-flash";
+}
 
 export function buildAntiSpoilerSystemPrompt(
   maxBook: number,
@@ -32,7 +34,7 @@ export function createChatModel() {
   const google = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   });
-  return google(CHAT_MODEL);
+  return google(getChatModelId());
 }
 
 export async function streamSpoilerFreeReply(options: {
@@ -49,7 +51,6 @@ export async function streamSpoilerFreeReply(options: {
     model: createChatModel(),
     system,
     prompt: options.prompt,
+    maxRetries: 1,
   });
 }
-
-export { CHAT_MODEL };

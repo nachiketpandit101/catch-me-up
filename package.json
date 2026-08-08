@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "ingest": "tsx scripts/ingest.ts"
+    "ingest": "tsx scripts/ingest.ts",
+    "list-models": "tsx scripts/list-models.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.39",
