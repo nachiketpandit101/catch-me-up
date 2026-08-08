@@ -4,6 +4,8 @@ export type Chapter = {
   content: string;
 };
 
+type ChapterDraft = Omit<Chapter, "content">;
+
 function stripFrontMatter(text: string): string {
   if (!text.startsWith("---")) return text;
   const end = text.indexOf("\n---", 3);
@@ -27,7 +29,7 @@ function parseHashChapters(raw: string): Chapter[] {
   const text = stripFrontMatter(raw);
   const lines = text.split("\n");
   const chapters: Chapter[] = [];
-  let current: Chapter | null = null;
+  let current: ChapterDraft | null = null;
   let buffer: string[] = [];
 
   const flush = () => {
@@ -69,7 +71,7 @@ function parseBoldNumberChapters(raw: string): Chapter[] {
   const text = stripFrontMatter(raw);
   const lines = text.split("\n");
   const chapters: Chapter[] = [];
-  let current: Chapter | null = null;
+  let current: ChapterDraft | null = null;
   let buffer: string[] = [];
   let prologueBuffer: string[] = [];
   let reachedChapters = false;
