@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.16.0",
     "@supabase/supabase-js": "^2.112.2",
+    "dotenv": "^17.4.2",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -22,6 +25,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.11",
     "typescript": "^5"
   }
 }
