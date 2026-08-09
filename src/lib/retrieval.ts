@@ -19,8 +19,8 @@ export async function getSpoilerFreeContext(
     query_embedding: queryEmbedding,
     filter_series: seriesId,
     max_book_limit: maxBook,
-    match_threshold: options?.matchThreshold ?? 0.7,
-    match_count: options?.matchCount ?? 5,
+    match_threshold: options?.matchThreshold ?? 0.55,
+    match_count: options?.matchCount ?? 12,
   });
 
   if (error) {
