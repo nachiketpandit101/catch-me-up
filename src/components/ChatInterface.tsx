@@ -1,15 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
-
-const SERIES_ID = "red-rising";
-const SERIES_TITLE = "Red Rising";
-const BOOKS = [
-  { number: 1, title: "Red Rising" },
-  { number: 2, title: "Golden Son" },
-] as const;
-
-const STORAGE_KEY = "catch-me-up:maxBookProgress";
+import type { CatalogBook, CatalogSeries } from "@/lib/catalog";
 
 type Message = {
   id: string;
@@ -17,8 +10,15 @@ type Message = {
   content: string;
 };
 
-export function ChatInterface() {
-  const [maxBookProgress, setMaxBookProgress] = useState(2);
+type ChatInterfaceProps = {
+  series: CatalogSeries;
+};
+
+export function ChatInterface({ series }: ChatInterfaceProps) {
+  const storageKey = `catch-me-up:maxBookProgress:${series.id}`;
+  const [maxBookProgress, setMaxBookProgress] = useState(
+    series.books[series.books.length - 1]?.number ?? 1,
+  );
   const [prompt, setPrompt] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -26,17 +26,18 @@ export function ChatInterface() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const stored = window.localStorage.getItem(storageKey);
     if (!stored) return;
     const parsed = Number(stored);
-    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= BOOKS.length) {
+    const maxBook = series.books[series.books.length - 1]?.number ?? 1;
+    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= maxBook) {
       setMaxBookProgress(parsed);
     }
-  }, []);
+  }, [series.books, storageKey]);
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, String(maxBookProgress));
-  }, [maxBookProgress]);
+    window.localStorage.setItem(storageKey, String(maxBookProgress));
+  }, [maxBookProgress, storageKey]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,7 +69,7 @@ export function ChatInterface() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: trimmed,
-          seriesId: SERIES_ID,
+          seriesId: series.id,
           maxBookProgress,
         }),
       });
@@ -130,19 +131,26 @@ export function ChatInterface() {
     }
   }
 
-  const currentBook =
-    BOOKS.find((book) => book.number === maxBookProgress) ?? BOOKS[0];
+  const currentBook: CatalogBook =
+    series.books.find((book) => book.number === maxBookProgress) ??
+    series.books[0];
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b border-[var(--line)] bg-[var(--panel)]/80 backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
           <div>
-            <p className="font-[family-name:var(--font-display)] text-2xl tracking-tight text-[var(--ink)] sm:text-3xl">
-              Catch Me Up
+            <Link
+              href="/"
+              className="text-xs uppercase tracking-[0.16em] text-[var(--muted)] transition hover:text-[var(--ink)]"
+            >
+              ← Library
+            </Link>
+            <p className="mt-2 font-[family-name:var(--font-display)] text-2xl tracking-tight text-[var(--ink)] sm:text-3xl">
+              {series.title}
             </p>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              Spoiler-bounded refresher for {SERIES_TITLE}
+              {series.author} · spoiler-bounded catch-up
             </p>
           </div>
 
@@ -156,7 +164,7 @@ export function ChatInterface() {
               className="min-w-[14rem] rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-[var(--ink)] outline-none ring-[var(--accent)] focus:ring-2"
               disabled={isStreaming}
             >
-              {BOOKS.map((book) => (
+              {series.books.map((book) => (
                 <option key={book.number} value={book.number}>
                   Reading: Book {book.number} — {book.title}
                 </option>
@@ -206,11 +214,14 @@ export function ChatInterface() {
           </p>
         )}
 
-        <form onSubmit={onSubmit} className="sticky bottom-0 mt-auto flex gap-2 bg-[var(--bg)]/95 pb-2 pt-3 backdrop-blur">
+        <form
+          onSubmit={onSubmit}
+          className="sticky bottom-0 mt-auto flex gap-2 bg-[var(--bg)]/95 pb-2 pt-3 backdrop-blur"
+        >
           <input
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
-            placeholder="What happened with Darrow at the Institute?"
+            placeholder={`Ask about ${series.title}…`}
             className="flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-3 text-[var(--ink)] outline-none ring-[var(--accent)] placeholder:text-[var(--muted)] focus:ring-2"
             disabled={isStreaming}
           />
