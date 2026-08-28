@@ -38,6 +38,7 @@ yarn-error.log*
 /data/**
 !/data/manifest.json
 !/data/README.md
+/data/.ingest-cache/
 
 # vercel
 .vercel

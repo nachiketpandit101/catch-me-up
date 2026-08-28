@@ -11,7 +11,7 @@ Spoiler-free book series catch-up assistant. Ask questions about a series; answe
 ## Setup
 
 1. Create a [Supabase](https://supabase.com) project and enable the **pgvector** extension.
-2. Run [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) in the SQL Editor.
+2. Run [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) and [`supabase/migrations/002_add_books_3_6.sql`](supabase/migrations/002_add_books_3_6.sql) in the SQL Editor.
 3. Create a [Google AI Studio](https://aistudio.google.com/apikey) API key.
 4. Copy `.env.example` to `.env.local` (or use `.env`) and fill in:
    - `NEXT_PUBLIC_SUPABASE_URL`
@@ -24,8 +24,19 @@ Spoiler-free book series catch-up assistant. Ask questions about a series; answe
 
 ```bash
 npm install
-npm run ingest
+npm run ingest                              # all books in manifest
+npm run ingest:books                        # books 3–6 only
+npx tsx scripts/ingest.ts red-rising 3 4 5 6   # same, explicit
+npx tsx scripts/ingest.ts red-rising 3 --fresh # redo one book from scratch
 npm run dev
+```
+
+Ingestion is resumable: if it stops on a 429 quota error, re-run the same command and it continues from the last saved chunk. Checkpoints live in `data/.ingest-cache/` (gitignored).
+
+For rate limits, pace embedding with env vars:
+
+```bash
+EMBED_DELAY_MS=2000 EMBED_UPSERT_BATCH=10 npm run ingest -- red-rising --books 3,4,5,6
 ```
 
 Open [http://localhost:3000](http://localhost:3000), set **Reading: Book N**, and ask questions.

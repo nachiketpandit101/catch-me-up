@@ -13,6 +13,26 @@
           "bookNumber": 2,
           "title": "Golden Son",
           "path": "data/red-rising/golden-son-book2.md"
+        },
+        {
+          "bookNumber": 3,
+          "title": "Morning Star",
+          "path": "data/red-rising/morning-star-book3.md"
+        },
+        {
+          "bookNumber": 4,
+          "title": "Iron Gold",
+          "path": "data/red-rising/iron-gold-book4.md"
+        },
+        {
+          "bookNumber": 5,
+          "title": "Dark Age",
+          "path": "data/red-rising/dark-age-book5.md"
+        },
+        {
+          "bookNumber": 6,
+          "title": "Light Bringer",
+          "path": "data/red-rising/light-bringer-book6.md"
         }
       ]
     }

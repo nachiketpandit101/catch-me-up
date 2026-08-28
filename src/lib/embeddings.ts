@@ -11,6 +11,7 @@ function getApiKey(): string {
   return key;
 }
 
+/** L2-normalize truncated gemini-embedding-001 vectors (required when dims != 3072). */
 function normalizeEmbedding(values: number[]): number[] {
   const norm = Math.sqrt(values.reduce((sum, v) => sum + v * v, 0));
   if (!norm) return values;

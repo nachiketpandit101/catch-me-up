@@ -6,6 +6,14 @@ export type Chapter = {
 
 type ChapterDraft = Omit<Chapter, "content">;
 
+type AnchorMeta = {
+  chapterNumber: number;
+  title: string;
+};
+
+const CALIBRE_ANCHOR_RE =
+  /^(?:part\d+\.(?:html|xhtml)|index_split_\d+\.html)$/i;
+
 function stripFrontMatter(text: string): string {
   if (!text.startsWith("---")) return text;
   const end = text.indexOf("\n---", 3);
@@ -15,14 +23,94 @@ function stripFrontMatter(text: string): string {
 
 function cleanMarkdown(text: string): string {
   return text
-    .replace(/::: ?\w*/g, "")
+    .replace(/```\{=html\}[\s\S]*?```/g, "")
+    .replace(/\{=\w+\}/g, "")
+    .replace(/::: ?[\w.[\]#-]*/g, "")
+    .replace(/\]\{#[^}]+\}/g, "")
+    .replace(/\[\]\{#[^}]+\}/g, "")
+    .replace(/\{#[^}]+\}/g, "")
+    .replace(/\{\.[\w-]+\}/g, "")
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[[^\]]*\]\([^)]*\)/g, "")
     .replace(/\*{1,2}([^*]+)\*{1,2}/g, "$1")
     .replace(/_{1,2}([^_]+)_{1,2}/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\\</g, "<")
+    .replace(/\\>/g, ">")
     .replace(/-{3,}/g, "")
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+function isFrontMatterSection(content: string): boolean {
+  const sample = content.slice(0, 1200).toLowerCase();
+  return (
+    sample.includes("library of congress") ||
+    sample.includes("copyright ©") ||
+    sample.includes("all rights reserved") ||
+    sample.includes("published in the united states") ||
+    sample.includes("isbn") ||
+    sample.includes("dramatis person") ||
+    sample.includes("table of contents") ||
+    sample.includes("contents") && sample.length < 4000
+  );
+}
+
+function buildCalibreTocMap(text: string): Map<string, AnchorMeta> {
+  const map = new Map<string, AnchorMeta>();
+  const tocBlob = text.slice(0, Math.min(text.length, 120_000));
+
+  const patterns = [
+    /\[(?:Chapter\s+(\d+):\s*([^\]\n]+)|Prologue)\][^\n]*?(?:#|\/)(part\d+\.(?:html|xhtml)|index_split_\d+\.html)/gi,
+    /\[\[(?:Chapter\s+(\d+):\s*([^\]\n]+)|Prologue)[^\]]*\][^\n]*?(?:#|\/)(part\d+\.(?:html|xhtml)|index_split_\d+\.html)/gi,
+  ];
+
+  for (const pattern of patterns) {
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(tocBlob)) !== null) {
+      const chapterNumber = match[1] ? Number(match[1]) : 0;
+      const title = match[1]
+        ? match[2].replace(/\s+/g, " ").trim()
+        : "Prologue";
+      const anchor = match[3].toLowerCase();
+      map.set(anchor, { chapterNumber, title });
+    }
+  }
+
+  return map;
+}
+
+function parseCalibreChapters(raw: string): Chapter[] {
+  const text = stripFrontMatter(raw);
+  const toc = buildCalibreTocMap(text);
+  if (toc.size < 3) return [];
+
+  const splitRe =
+    /^\[\]\{#((?:part\d+\.(?:html|xhtml))|(?:index_split_\d+\.html))\}\s*$/gim;
+  const parts = text.split(splitRe);
+  const chapters: Chapter[] = [];
+
+  // split() with capture group: [preamble, anchor1, body1, anchor2, body2, ...]
+  for (let i = 1; i < parts.length; i += 2) {
+    const anchor = parts[i].toLowerCase();
+    const body = parts[i + 1] ?? "";
+    const meta = toc.get(anchor);
+    if (!meta) continue;
+
+    const content = cleanMarkdown(body);
+    if (content.length < 200) continue;
+    if (isFrontMatterSection(content)) continue;
+
+    chapters.push({
+      chapterNumber: meta.chapterNumber,
+      title: meta.title,
+      content,
+    });
+  }
+
+  chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
+  return chapters;
 }
 
 function parseHashChapters(raw: string): Chapter[] {
@@ -145,14 +233,19 @@ function parseBoldNumberChapters(raw: string): Chapter[] {
 /** Detect chapter style and return numbered chapters with cleaned text. */
 export function parseChapters(raw: string): Chapter[] {
   const normalized = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
   const hashChapters = parseHashChapters(normalized);
   if (hashChapters.length >= 5) return hashChapters;
 
   const boldChapters = parseBoldNumberChapters(normalized);
   if (boldChapters.length >= 5) return boldChapters;
 
-  // Fallback: treat whole file as one chapter
+  const calibreChapters = parseCalibreChapters(normalized);
+  if (calibreChapters.length >= 3) return calibreChapters;
+
   const content = cleanMarkdown(stripFrontMatter(normalized));
   if (!content) return [];
   return [{ chapterNumber: 1, title: "Full text", content }];
 }
+
+export { CALIBRE_ANCHOR_RE };
