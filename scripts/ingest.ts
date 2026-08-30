@@ -255,10 +255,25 @@ async function ingestBook(
   console.log(`  Done: ${book.title}`);
 }
 
-async function main() {
+function assertEmbeddingAuth() {
+  const useVertex =
+    process.env.GOOGLE_GENAI_USE_VERTEXAI === "true" ||
+    process.env.GOOGLE_GENAI_USE_VERTEXAI === "1";
+
+  if (useVertex) {
+    if (!process.env.GOOGLE_CLOUD_PROJECT) {
+      throw new Error("Set GOOGLE_CLOUD_PROJECT for Vertex ingest");
+    }
+    return;
+  }
+
   if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     throw new Error("Set GOOGLE_GENERATIVE_AI_API_KEY in .env or .env.local");
   }
+}
+
+async function main() {
+  assertEmbeddingAuth();
 
   const options = parseArgs(process.argv.slice(2));
   const manifest = await loadManifest();

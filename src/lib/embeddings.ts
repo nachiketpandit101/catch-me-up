@@ -42,6 +42,23 @@ function sleep(ms: number) {
 }
 
 export function createGoogleGenAI() {
+  const useVertex =
+    process.env.GOOGLE_GENAI_USE_VERTEXAI === "true" ||
+    process.env.GOOGLE_GENAI_USE_VERTEXAI === "1";
+
+  if (useVertex) {
+    const project = process.env.GOOGLE_CLOUD_PROJECT;
+    const location = process.env.GOOGLE_CLOUD_LOCATION ?? "us-central1";
+    if (!project) {
+      throw new Error("Set GOOGLE_CLOUD_PROJECT for Vertex AI embeddings");
+    }
+    return new GoogleGenAI({
+      vertexai: true,
+      project,
+      location,
+    });
+  }
+
   return new GoogleGenAI({ apiKey: getApiKey() });
 }
 
