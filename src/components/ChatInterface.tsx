@@ -216,7 +216,7 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
 
         <form
           onSubmit={onSubmit}
-          className="sticky bottom-0 mt-auto flex gap-2 bg-[var(--bg)]/95 pb-2 pt-3 backdrop-blur"
+          className="sticky bottom-0 mt-auto flex items-center gap-2 bg-[var(--bg)]/95 pb-2 pt-3 backdrop-blur"
         >
           <input
             value={prompt}
@@ -228,9 +228,27 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
           <button
             type="submit"
             disabled={isStreaming || !prompt.trim()}
-            className="rounded-md bg-[var(--accent)] px-4 py-3 font-medium text-[var(--accent-ink)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label="Send message"
+            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isStreaming ? "…" : "Ask"}
+            {isStreaming ? (
+              <span className="text-lg leading-none">…</span>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-5"
+                aria-hidden="true"
+              >
+                <path d="M12 19V5" />
+                <path d="m5 12 7-7 7 7" />
+              </svg>
+            )}
           </button>
         </form>
       </main>
