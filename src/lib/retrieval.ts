@@ -1,4 +1,5 @@
 import { generateEmbedding } from "@/lib/embeddings";
+import { getRerankProvider, rerankChunks } from "@/lib/rerank";
 import { DEFAULT_RRF_K, fuseByRRF } from "@/lib/rrf";
 import { createServiceSupabaseClient } from "@/lib/supabase/server";
 import type { BookChunk, RetrievedChunk } from "@/lib/types";
@@ -8,7 +9,9 @@ type Supabase = ReturnType<typeof createServiceSupabaseClient>;
 export type RetrievalOptions = {
   /** Candidates pulled from each retriever before fusion. */
   candidates?: number;
-  /** Chunks returned after fusion. */
+  /** Fused candidates handed to the cross-encoder. */
+  rerankCandidates?: number;
+  /** Chunks returned after reranking. */
   finalCount?: number;
   matchThreshold?: number;
   rrfK?: number;
@@ -76,7 +79,8 @@ async function sparseSearch(
 
 /**
  * Hybrid retrieval: dense vector search for paraphrased questions, BM25 for
- * exact names and rare terms, merged with Reciprocal Rank Fusion.
+ * exact names and rare terms, merged with Reciprocal Rank Fusion and trimmed
+ * to the context window by a cross-encoder.
  *
  * Both retrievers apply the `book_number <= maxBook` filter in SQL, so no
  * chunk past the reader's progress can enter the candidate pool.
@@ -89,6 +93,9 @@ export async function getSpoilerFreeContext(
 ): Promise<RetrievedChunk[]> {
   const candidates = Math.floor(
     options?.candidates ?? envNumber("RETRIEVAL_CANDIDATES", 40),
+  );
+  const rerankCandidates = Math.floor(
+    options?.rerankCandidates ?? envNumber("RERANK_CANDIDATES", 40),
   );
   const finalCount = Math.floor(
     options?.finalCount ?? envNumber("RETRIEVAL_FINAL_CHUNKS", 12),
@@ -121,8 +128,10 @@ export async function getSpoilerFreeContext(
   const denseById = new Map(dense.map((chunk) => [chunk.id, chunk]));
   const sparseById = new Map(sparse.map((chunk) => [chunk.id, chunk]));
 
-  const results: RetrievedChunk[] = fused
-    .slice(0, finalCount)
+  // Rerank a wide pool, then trim: the cross-encoder is the component that can
+  // afford to be picky, so fusion should hand it recall rather than precision.
+  const pool: RetrievedChunk[] = fused
+    .slice(0, Math.max(rerankCandidates, finalCount))
     .map(({ item, score, ranks }) => ({
       ...item,
       similarity: denseById.get(item.id)?.similarity,
@@ -131,13 +140,18 @@ export async function getSpoilerFreeContext(
       ranks,
     }));
 
+  const results = await rerankChunks(query, pool, finalCount);
+
   if (isDebug()) {
     console.log(
-      `[retrieval] "${query}" dense=${dense.length} sparse=${sparse.length} fused=${fused.length} returned=${results.length}`,
+      `[retrieval] "${query}" dense=${dense.length} sparse=${sparse.length} ` +
+        `fused=${fused.length} reranked=${pool.length} via ${getRerankProvider()} ` +
+        `returned=${results.length}`,
     );
     for (const chunk of results) {
       console.log(
         `  b${chunk.book_number} ch${chunk.chapter_number}#${chunk.chunk_index} ` +
+          `rerank=${chunk.rerankScore?.toFixed(4) ?? "-"} ` +
           `rrf=${chunk.fusedScore?.toFixed(5)} ranks=${JSON.stringify(chunk.ranks)} ` +
           `cos=${chunk.similarity?.toFixed(3) ?? "-"} bm25=${chunk.bm25Score?.toFixed(2) ?? "-"}`,
       );

@@ -48,7 +48,21 @@ Every question runs two retrievers over the same spoiler-bounded scope, both fil
 - **Dense** — `match_book_chunks` cosine search over pgvector embeddings, for paraphrased questions.
 - **Sparse** — `bm25_book_chunks`, an Okapi BM25 implementation over Postgres `tsvector`, for exact names and rare terms that embeddings blur together.
 
-Their ranked lists are merged with Reciprocal Rank Fusion, `score(d) = Σ weight / (k + rank(d))`, which fuses on rank so incomparable cosine and BM25 scales need no normalization. Set `RETRIEVAL_DEBUG=true` to log per-chunk ranks and scores for each query.
+Their ranked lists are merged with Reciprocal Rank Fusion, `score(d) = Σ weight / (k + rank(d))`, which fuses on rank so incomparable cosine and BM25 scales need no normalization.
+
+The fused pool is then reranked. Both retrievers score the query and a chunk independently, so a chunk can rank highly while answering a different question; a cross-encoder reads the pair together and is much more accurate, but only affordably over a shortlist. `RERANK_CANDIDATES` fused chunks go to the reranker, which trims them to `RETRIEVAL_FINAL_CHUNKS` for the answer context.
+
+Set `RERANK_PROVIDER`, or let it auto-detect from whichever credential is present:
+
+| Provider | Configure with | Notes |
+|---|---|---|
+| `cohere` | `COHERE_API_KEY` | Cohere Rerank, default `rerank-v3.5` |
+| `jina` | `JINA_API_KEY` | Jina Reranker |
+| `tei` | `RERANK_ENDPOINT` | Self-hosted BGE-Reranker behind HuggingFace Text Embeddings Inference |
+| `gemini` | `RERANK_PROVIDER=gemini` | Listwise LLM fallback; opt-in only since it spends chat quota per query |
+| `none` | — | Default when nothing is configured; fusion order is used as-is |
+
+Reranking is best-effort: a provider error or a timeout past `RERANK_TIMEOUT_MS` falls back to fusion order instead of failing the request. Set `RETRIEVAL_DEBUG=true` to log per-chunk ranks and scores for each query.
 
 If migration `003` has not been applied, sparse retrieval is skipped and the app falls back to dense-only.
 

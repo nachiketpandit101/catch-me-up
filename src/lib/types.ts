@@ -12,6 +12,7 @@ export type BookChunk = {
 export type RetrievedChunk = BookChunk & {
   bm25Score?: number;
   fusedScore?: number;
+  rerankScore?: number;
   /** 1-based rank per retriever that surfaced this chunk. */
   ranks?: Record<string, number>;
 };
