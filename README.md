@@ -11,7 +11,7 @@ Spoiler-free book series catch-up assistant. Ask questions about a series; answe
 ## Setup
 
 1. Create a [Supabase](https://supabase.com) project and enable the **pgvector** extension.
-2. Run [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) and [`supabase/migrations/002_add_books_3_6.sql`](supabase/migrations/002_add_books_3_6.sql) in the SQL Editor.
+2. Run the files in [`supabase/migrations/`](supabase/migrations) in order (`001_init.sql`, `002_add_books_3_6.sql`, `003_hybrid_search.sql`) in the SQL Editor.
 3. Create a [Google AI Studio](https://aistudio.google.com/apikey) API key.
 4. Copy `.env.example` to `.env.local` (or use `.env`) and fill in:
    - `NEXT_PUBLIC_SUPABASE_URL`
@@ -40,6 +40,17 @@ Chapters are split structurally rather than at fixed offsets. `recursiveSplit` w
 Set `CHUNK_STRATEGY=semantic` to place boundaries where meaning shifts instead: each sentence is embedded with its neighbours, cosine distance between consecutive windows is measured, and gaps above `SEMANTIC_PERCENTILE` become breakpoints. This costs one embedding per sentence, so it is off by default. Semantic chunk plans are cached in `data/.ingest-cache/*.chunks.json` and reused across resumed runs.
 
 Changing any chunking setting requires re-ingesting with `--fresh`.
+
+## Retrieval
+
+Every question runs two retrievers over the same spoiler-bounded scope, both filtering `book_number <= your progress` in SQL:
+
+- **Dense** — `match_book_chunks` cosine search over pgvector embeddings, for paraphrased questions.
+- **Sparse** — `bm25_book_chunks`, an Okapi BM25 implementation over Postgres `tsvector`, for exact names and rare terms that embeddings blur together.
+
+Their ranked lists are merged with Reciprocal Rank Fusion, `score(d) = Σ weight / (k + rank(d))`, which fuses on rank so incomparable cosine and BM25 scales need no normalization. Set `RETRIEVAL_DEBUG=true` to log per-chunk ranks and scores for each query.
+
+If migration `003` has not been applied, sparse retrieval is skipped and the app falls back to dense-only.
 
 For rate limits, pace embedding with env vars:
 
