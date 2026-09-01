@@ -1,5 +1,7 @@
-const TARGET_CHARS = 500 * 4; // ~500 tokens
-const OVERLAP_CHARS = 50 * 4; // ~50 tokens
+import { semanticChunk, type Embedder } from "./semantic";
+import { packBlocks, recursiveSplit, type PackOptions } from "./text";
+
+export type ChunkStrategy = "structural" | "semantic";
 
 export type ChunkRecord = {
   series_id: string;
@@ -9,46 +11,66 @@ export type ChunkRecord = {
   content: string;
 };
 
+export type ChunkOptions = {
+  strategy?: ChunkStrategy;
+  embed?: Embedder;
+};
+
+function envNumber(name: string, fallback: number): number {
+  const parsed = Number(process.env[name]);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+}
+
+export function getChunkStrategy(): ChunkStrategy {
+  return process.env.CHUNK_STRATEGY === "semantic" ? "semantic" : "structural";
+}
+
+function getPackOptions(): PackOptions {
+  return {
+    targetChars: envNumber("CHUNK_TARGET_CHARS", 1800),
+    minChars: envNumber("CHUNK_MIN_CHARS", 500),
+    maxChars: envNumber("CHUNK_MAX_CHARS", 2600),
+    overlapChars: envNumber("CHUNK_OVERLAP_CHARS", 250),
+  };
+}
+
+/** Structure-aware split: scene break > paragraph > line > sentence. */
 export function chunkText(text: string): string[] {
   const normalized = text.replace(/\r\n/g, "\n").trim();
   if (!normalized) return [];
-  if (normalized.length <= TARGET_CHARS) return [normalized];
 
-  const chunks: string[] = [];
-  let start = 0;
-
-  while (start < normalized.length) {
-    let end = Math.min(start + TARGET_CHARS, normalized.length);
-
-    if (end < normalized.length) {
-      const window = normalized.slice(start, end);
-      const paragraphBreak = window.lastIndexOf("\n\n");
-      const sentenceBreak = window.lastIndexOf(". ");
-      const breakAt = Math.max(paragraphBreak, sentenceBreak);
-      if (breakAt > TARGET_CHARS * 0.5) {
-        end = start + breakAt + (sentenceBreak === breakAt ? 1 : 0);
-      }
-    }
-
-    const piece = normalized.slice(start, end).trim();
-    if (piece.length > 40) chunks.push(piece);
-
-    if (end >= normalized.length) break;
-    start = Math.max(0, end - OVERLAP_CHARS);
-  }
-
-  return chunks;
+  const options = getPackOptions();
+  return packBlocks(recursiveSplit(normalized, options.maxChars), options);
 }
 
-export function chunkChapters(
+export async function chunkChapters(
   seriesId: string,
   bookNumber: number,
   chapters: { chapterNumber: number; content: string }[],
-): ChunkRecord[] {
+  options: ChunkOptions = {},
+): Promise<ChunkRecord[]> {
+  const strategy = options.strategy ?? getChunkStrategy();
+  const packOptions = getPackOptions();
   const records: ChunkRecord[] = [];
 
+  if (strategy === "semantic" && !options.embed) {
+    throw new Error("CHUNK_STRATEGY=semantic requires an embedder");
+  }
+
   for (const chapter of chapters) {
-    const pieces = chunkText(chapter.content);
+    const normalized = chapter.content.replace(/\r\n/g, "\n").trim();
+    if (!normalized) continue;
+
+    const pieces =
+      strategy === "semantic"
+        ? await semanticChunk(normalized, {
+            ...packOptions,
+            embed: options.embed!,
+            bufferSize: envNumber("SEMANTIC_BUFFER_SIZE", 1),
+            percentile: envNumber("SEMANTIC_PERCENTILE", 90),
+          })
+        : chunkText(normalized);
+
     pieces.forEach((content, chunkIndex) => {
       records.push({
         series_id: seriesId,

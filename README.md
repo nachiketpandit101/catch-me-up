@@ -33,6 +33,14 @@ npm run dev
 
 Ingestion is resumable: if it stops on a 429 quota error, re-run the same command and it continues from the last saved chunk. Checkpoints live in `data/.ingest-cache/` (gitignored).
 
+## Chunking
+
+Chapters are split structurally rather than at fixed offsets. `recursiveSplit` walks a boundary hierarchy — scene break, paragraph, line, sentence — and only falls back to a hard cut when a single sentence exceeds the size cap. Blocks are then packed toward `CHUNK_TARGET_CHARS` with whole-sentence overlap carried between neighbours.
+
+Set `CHUNK_STRATEGY=semantic` to place boundaries where meaning shifts instead: each sentence is embedded with its neighbours, cosine distance between consecutive windows is measured, and gaps above `SEMANTIC_PERCENTILE` become breakpoints. This costs one embedding per sentence, so it is off by default. Semantic chunk plans are cached in `data/.ingest-cache/*.chunks.json` and reused across resumed runs.
+
+Changing any chunking setting requires re-ingesting with `--fresh`.
+
 For rate limits, pace embedding with env vars:
 
 ```bash

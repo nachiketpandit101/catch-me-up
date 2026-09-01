@@ -1,9 +1,15 @@
 import { config } from "dotenv";
+import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { generateEmbeddingsBatch } from "../src/lib/embeddings";
-import { chunkChapters } from "../src/lib/ingest/chunk";
+import {
+  chunkChapters,
+  getChunkStrategy,
+  type ChunkRecord,
+  type ChunkStrategy,
+} from "../src/lib/ingest/chunk";
 import { parseChapters } from "../src/lib/ingest/parse";
 
 config({ path: ".env.local" });
@@ -31,6 +37,12 @@ type IngestCheckpoint = {
   nextChunkIndex: number;
   totalChunks: number;
   updatedAt: string;
+};
+
+type ChunkPlan = {
+  strategy: ChunkStrategy;
+  fingerprint: string;
+  chunks: ChunkRecord[];
 };
 
 type IngestOptions = {
@@ -146,6 +158,67 @@ async function clearCheckpoint(seriesId: string, bookNumber: number) {
   }
 }
 
+function chunkPlanPath(seriesId: string, bookNumber: number) {
+  return path.join(
+    process.cwd(),
+    "data",
+    ".ingest-cache",
+    `${seriesId}-book-${bookNumber}.chunks.json`,
+  );
+}
+
+/** Chunk output depends on the source text, the strategy, and the size knobs. */
+function chunkFingerprint(raw: string, strategy: ChunkStrategy): string {
+  const settings = [
+    strategy,
+    process.env.CHUNK_TARGET_CHARS ?? "",
+    process.env.CHUNK_MIN_CHARS ?? "",
+    process.env.CHUNK_MAX_CHARS ?? "",
+    process.env.CHUNK_OVERLAP_CHARS ?? "",
+    process.env.SEMANTIC_BUFFER_SIZE ?? "",
+    process.env.SEMANTIC_PERCENTILE ?? "",
+  ].join("|");
+
+  return createHash("sha256").update(raw).update(settings).digest("hex").slice(0, 16);
+}
+
+async function loadChunkPlan(
+  seriesId: string,
+  bookNumber: number,
+  fingerprint: string,
+): Promise<ChunkRecord[] | null> {
+  try {
+    const raw = await readFile(chunkPlanPath(seriesId, bookNumber), "utf8");
+    const plan = JSON.parse(raw) as ChunkPlan;
+    return plan.fingerprint === fingerprint ? plan.chunks : null;
+  } catch {
+    return null;
+  }
+}
+
+async function saveChunkPlan(
+  seriesId: string,
+  bookNumber: number,
+  plan: ChunkPlan,
+) {
+  const dir = path.join(process.cwd(), "data", ".ingest-cache");
+  await mkdir(dir, { recursive: true });
+  await writeFile(
+    chunkPlanPath(seriesId, bookNumber),
+    JSON.stringify(plan),
+    "utf8",
+  );
+}
+
+async function clearChunkPlan(seriesId: string, bookNumber: number) {
+  try {
+    const { unlink } = await import("node:fs/promises");
+    await unlink(chunkPlanPath(seriesId, bookNumber));
+  } catch {
+    // no cached plan
+  }
+}
+
 async function ingestBook(
   seriesId: string,
   book: ManifestBook,
@@ -157,11 +230,39 @@ async function ingestBook(
   );
 
   const raw = await readFile(filePath, "utf8");
-  const chapters = parseChapters(raw);
-  console.log(`  Parsed ${chapters.length} chapters`);
+  const strategy = getChunkStrategy();
+  const fingerprint = chunkFingerprint(raw, strategy);
 
-  const chunks = chunkChapters(seriesId, book.bookNumber, chapters);
-  console.log(`  Created ${chunks.length} chunks`);
+  let chunks = options.fresh
+    ? null
+    : await loadChunkPlan(seriesId, book.bookNumber, fingerprint);
+
+  if (chunks) {
+    console.log(`  Reusing cached ${strategy} chunk plan (${chunks.length} chunks)`);
+  } else {
+    const chapters = parseChapters(raw);
+    console.log(`  Parsed ${chapters.length} chapters`);
+
+    if (strategy === "semantic") {
+      console.log("  Semantic chunking: embedding sentence windows first...");
+    }
+
+    chunks = await chunkChapters(seriesId, book.bookNumber, chapters, {
+      strategy,
+      embed: (texts) => generateEmbeddingsBatch(texts),
+    });
+    console.log(`  Created ${chunks.length} chunks (${strategy})`);
+
+    // Semantic plans cost an embedding call per sentence window; keep them so a
+    // resumed run does not pay for the same analysis twice.
+    if (strategy === "semantic" && chunks.length > 0) {
+      await saveChunkPlan(seriesId, book.bookNumber, {
+        strategy,
+        fingerprint,
+        chunks,
+      });
+    }
+  }
 
   if (chunks.length === 0) {
     console.warn("  No chunks to embed; skipping");
@@ -174,6 +275,7 @@ async function ingestBook(
 
   if (options.fresh) {
     await clearCheckpoint(seriesId, book.bookNumber);
+    await clearChunkPlan(seriesId, book.bookNumber);
     const { error: deleteError } = await supabase
       .from("book_chunks")
       .delete()
