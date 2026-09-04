@@ -3,16 +3,31 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import type { CatalogBook, CatalogSeries } from "@/lib/catalog";
+import { SOURCES_HEADER, decodeCitations, type Citation } from "@/lib/citations";
 
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  citations?: Citation[];
 };
 
 type ChatInterfaceProps = {
   series: CatalogSeries;
 };
+
+function citationDetail(citation: Citation): string {
+  const parts = [
+    `${citation.chunkCount} chunk${citation.chunkCount === 1 ? "" : "s"}`,
+  ];
+  if (citation.bestRerankScore !== undefined) {
+    parts.push(`rerank ${citation.bestRerankScore.toFixed(3)}`);
+  }
+  if (citation.bestSimilarity !== undefined) {
+    parts.push(`similarity ${citation.bestSimilarity.toFixed(3)}`);
+  }
+  return parts.join(" · ");
+}
 
 export function ChatInterface({ series }: ChatInterfaceProps) {
   const storageKey = `catch-me-up:maxBookProgress:${series.id}`;
@@ -83,6 +98,17 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
 
       if (!response.body) {
         throw new Error("No response stream from server");
+      }
+
+      // Sources arrive as a header, so they can be shown before the answer
+      // finishes streaming.
+      const citations = decodeCitations(response.headers.get(SOURCES_HEADER));
+      if (citations.length > 0) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === assistantId ? { ...message, citations } : message,
+          ),
+        );
       }
 
       const reader = response.body.getReader();
@@ -203,6 +229,23 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
               <p className="whitespace-pre-wrap leading-relaxed">
                 {message.content || (isStreaming ? "…" : "")}
               </p>
+
+              {message.role === "assistant" &&
+                message.citations &&
+                message.citations.length > 0 && (
+                  <p className="mt-3 border-t border-[var(--line)] pt-2 text-xs text-[var(--muted)]">
+                    <span className="uppercase tracking-wide">Sources:</span>{" "}
+                    {message.citations.map((citation, index) => (
+                      <span
+                        key={citation.label}
+                        title={citationDetail(citation)}
+                      >
+                        {index > 0 && " · "}
+                        {citation.label}
+                      </span>
+                    ))}
+                  </p>
+                )}
             </div>
           ))}
           <div ref={bottomRef} />

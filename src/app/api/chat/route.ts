@@ -1,4 +1,9 @@
 import { getChatModelId, streamSpoilerFreeReply } from "@/lib/chat";
+import {
+  SOURCES_HEADER,
+  buildCitations,
+  encodeCitations,
+} from "@/lib/citations";
 import { getSpoilerFreeContext } from "@/lib/retrieval";
 import type { ChatRequestBody } from "@/lib/types";
 
@@ -79,7 +84,11 @@ export async function POST(request: Request) {
       retrievedChunks,
     });
 
-    return result.toTextStreamResponse();
+    return result.toTextStreamResponse({
+      headers: {
+        [SOURCES_HEADER]: encodeCitations(buildCitations(retrievedChunks)),
+      },
+    });
   } catch (error) {
     const { message, status } = formatApiError(error);
     return Response.json({ error: message }, { status });
