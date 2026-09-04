@@ -9,6 +9,8 @@
     "lint": "eslint",
     "ingest": "tsx scripts/ingest.ts",
     "ingest:books": "tsx scripts/ingest.ts red-rising 3 4 5 6",
+    "eval": "tsx scripts/eval-retrieval.ts",
+    "eval:ground": "tsx scripts/eval-ground.ts",
     "list-models": "tsx scripts/list-models.ts"
   },
   "dependencies": {

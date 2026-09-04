@@ -66,6 +66,30 @@ Reranking is best-effort: a provider error or a timeout past `RERANK_TIMEOUT_MS`
 
 If migration `003` has not been applied, sparse retrieval is skipped and the app falls back to dense-only.
 
+Answers cite their sources. The API returns one citation per chapter in the `x-sources` response header (base64 JSON), so the answer body stays a plain text stream and sources render before the first token arrives. Chapters found only by BM25 carry no `bestSimilarity`, which makes it easy to see when keyword search is doing the work.
+
+## Evaluation
+
+[`eval/red-rising.json`](eval/red-rising.json) holds 81 grounded cases: 66 answerable questions across the six books, plus 15 "should refuse" questions whose answers live in a book past the reader's progress.
+
+Expected chapters are never hand-written. Each case declares keywords, and `npm run eval:ground` resolves the chapters that actually contain them from the local book text, rejecting keywords too broad to be a useful target. It also validates every refusal case by confirming the keywords appear in **no** book at or below that case's progress — which is how the first draft was caught claiming Ragnar was unknown at book 2 when he is named there.
+
+```bash
+npm run eval:ground                                   # refresh expected chapters
+npm run eval                                          # retrieval only, no LLM
+npm run eval -- --no-rerank --threshold 0.3,0.7       # sweep a parameter
+npm run eval -- --case b1- --concurrency 8            # filter to a subset
+```
+
+The runner never calls the chat model, so a full pass costs one query embedding per question (cached across sweep combinations) and takes about 12 seconds. It reports recall@1/@5/@k, MRR, mean top cosine for answerable versus refusal cases, and asserts that no chunk past the reader's progress was ever retrieved.
+
+Baseline at the shipped defaults: **recall@12 = 100%**, MRR 0.774, zero spoiler violations, zero refusal leaks, ~200ms mean retrieval latency.
+
+Two findings worth knowing before tuning:
+
+- `DENSE_MATCH_THRESHOLD` does nothing between 0.3 and 0.6, because it only prunes a dense tail that RRF already ranks below the sparse hits. It first bites at **0.70**, where refusal cases lose every dense match while answerable recall@12 stays at 100%. By 0.75 recall starts breaking.
+- The mean cosine gap between answerable and refusal questions is only ~0.07 at the default threshold, so a similarity cutoff cannot by itself decide when to refuse. Spoiler safety comes from the SQL `book_number` filter, not from scores.
+
 For rate limits, pace embedding with env vars:
 
 ```bash

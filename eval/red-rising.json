@@ -1,0 +1,1874 @@
+{
+  "seriesId": "red-rising",
+  "note": "expect.chapters is derived from the local book text by scripts/eval-ground.ts. Do not hand-edit it; change keywords and re-run grounding instead.",
+  "cases": [
+    {
+      "id": "b1-helldiver",
+      "question": "What is Darrow's job in the mines of Lykos?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "helldiver",
+          "drill"
+        ],
+        "chapters": [
+          1,
+          2,
+          3,
+          4,
+          7,
+          11,
+          12,
+          13,
+          15,
+          18,
+          19
+        ]
+      }
+    },
+    {
+      "id": "b1-eo-gallows",
+      "question": "Why is Eo executed, and who carries out the sentence?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "eo",
+          "gallows"
+        ],
+        "chapters": [
+          3,
+          5,
+          6,
+          7
+        ]
+      }
+    },
+    {
+      "id": "b1-eo-song",
+      "question": "What forbidden song does Eo sing before she dies?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "persephone"
+        ],
+        "chapters": [
+          8,
+          16,
+          34
+        ]
+      }
+    },
+    {
+      "id": "b1-dancer-recruit",
+      "question": "Who recruits Darrow into the Sons of Ares after he is hanged?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "dancer",
+          "sons of ares"
+        ],
+        "chapters": [
+          3,
+          7,
+          8,
+          9,
+          14,
+          44
+        ]
+      }
+    },
+    {
+      "id": "b1-mickey-carving",
+      "question": "Who carves Darrow into a Gold, and what does the procedure do to his body?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "mickey"
+        ],
+        "chapters": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          16,
+          32,
+          38,
+          41
+        ]
+      }
+    },
+    {
+      "id": "b1-matteo",
+      "question": "Who teaches Darrow how to speak and behave like a Gold?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "matteo"
+        ],
+        "chapters": [
+          13,
+          14,
+          15,
+          16,
+          18,
+          21,
+          22,
+          24,
+          26
+        ]
+      }
+    },
+    {
+      "id": "b1-passage",
+      "question": "What is the Passage at the Institute?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "passage",
+          "julian"
+        ],
+        "chapters": [
+          16,
+          18,
+          19,
+          20,
+          23,
+          29,
+          30,
+          32,
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "id": "b1-julian-death",
+      "question": "How does Julian die, and whose brother was he?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "julian",
+          "brother"
+        ],
+        "chapters": [
+          16,
+          18,
+          20,
+          22,
+          24,
+          28,
+          29,
+          30,
+          32,
+          33,
+          34,
+          43,
+          44
+        ]
+      }
+    },
+    {
+      "id": "b1-cassius-turn",
+      "question": "Why does Cassius turn against Darrow and challenge him?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "cassius",
+          "duel"
+        ],
+        "chapters": [
+          16,
+          18,
+          20,
+          22,
+          23,
+          25,
+          29,
+          31,
+          32,
+          33,
+          42,
+          43
+        ]
+      }
+    },
+    {
+      "id": "b1-fitchner",
+      "question": "Who is Proctor Fitchner and what role does he play at the Institute?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "fitchner",
+          "proctor"
+        ],
+        "chapters": [
+          17,
+          19,
+          21,
+          22,
+          29,
+          30,
+          32,
+          34,
+          37,
+          38,
+          39,
+          40,
+          41,
+          43,
+          44
+        ]
+      }
+    },
+    {
+      "id": "b1-howlers",
+      "question": "Who are the Howlers and who leads them?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "howlers"
+        ],
+        "chapters": [
+          30,
+          31,
+          32,
+          36,
+          38,
+          40,
+          41,
+          42,
+          43,
+          44
+        ]
+      }
+    },
+    {
+      "id": "b1-mustang-identity",
+      "question": "Who is Mustang, and what is her real name?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "mustang",
+          "virginia"
+        ],
+        "chapters": [
+          26,
+          35,
+          38,
+          43
+        ]
+      }
+    },
+    {
+      "id": "b1-jackal",
+      "question": "Who is the Jackal?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "jackal"
+        ],
+        "chapters": [
+          27,
+          29,
+          30,
+          32,
+          33,
+          34,
+          35,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44
+        ]
+      }
+    },
+    {
+      "id": "b1-lykos",
+      "question": "What is Lykos and who lives there?",
+      "progress": 1,
+      "expect": {
+        "book": 1,
+        "keywords": [
+          "lykos",
+          "laurel"
+        ],
+        "chapters": [
+          1,
+          2,
+          3,
+          4,
+          13,
+          25,
+          34
+        ]
+      }
+    },
+    {
+      "id": "b2-karnus-academy",
+      "question": "What happens to Darrow at the Academy, and who defeats him?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "karnus",
+          "academy"
+        ],
+        "chapters": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          12,
+          15,
+          31,
+          36
+        ]
+      }
+    },
+    {
+      "id": "b2-lancer",
+      "question": "What is Darrow's position in House Augustus?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "lancer",
+          "augustus"
+        ],
+        "chapters": [
+          0,
+          3,
+          4,
+          5,
+          6,
+          10,
+          11,
+          12,
+          13,
+          18,
+          19,
+          21,
+          33
+        ]
+      }
+    },
+    {
+      "id": "b2-tactus",
+      "question": "What does Tactus do, and how does Darrow respond?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "tactus",
+          "whip"
+        ],
+        "chapters": [
+          2,
+          12,
+          17,
+          18,
+          29,
+          51
+        ]
+      }
+    },
+    {
+      "id": "b2-lorn",
+      "question": "Who is Lorn au Arcos?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "lorn",
+          "rage knight"
+        ],
+        "chapters": [
+          0,
+          6,
+          8,
+          11,
+          13,
+          15,
+          28,
+          29,
+          31,
+          32,
+          36
+        ]
+      }
+    },
+    {
+      "id": "b2-victra",
+      "question": "Who is Victra au Julii and whose side is she on?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "victra",
+          "julii"
+        ],
+        "chapters": [
+          0,
+          1,
+          3,
+          6,
+          7,
+          12,
+          15,
+          18,
+          19,
+          21,
+          25,
+          32,
+          33,
+          34,
+          35,
+          36,
+          43,
+          45
+        ]
+      }
+    },
+    {
+      "id": "b2-quicksilver",
+      "question": "Who is Quicksilver?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "quicksilver"
+        ],
+        "chapters": [
+          4,
+          6,
+          7,
+          10,
+          11,
+          50
+        ]
+      }
+    },
+    {
+      "id": "b2-ares-identity",
+      "question": "Who is revealed to be Ares, the leader of the Sons of Ares?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "fitchner",
+          "ares"
+        ],
+        "chapters": [
+          0,
+          10,
+          11,
+          13,
+          14,
+          15,
+          16,
+          18,
+          19,
+          23,
+          32,
+          37,
+          41,
+          42,
+          43,
+          45,
+          46,
+          51
+        ]
+      }
+    },
+    {
+      "id": "b2-jackal-deal",
+      "question": "What pact does Darrow strike with the Jackal?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "jackal",
+          "pact"
+        ],
+        "chapters": [
+          12,
+          13,
+          22,
+          24,
+          25,
+          35,
+          43
+        ]
+      }
+    },
+    {
+      "id": "b2-roque",
+      "question": "Who is Roque au Fabii and how does he feel about Darrow?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "roque",
+          "poet"
+        ],
+        "chapters": [
+          0,
+          1,
+          6,
+          38,
+          44,
+          51
+        ]
+      }
+    },
+    {
+      "id": "b2-orion",
+      "question": "Who is Orion and what does she command?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "orion"
+        ],
+        "chapters": [
+          22,
+          27,
+          30,
+          31,
+          36,
+          37,
+          38
+        ]
+      }
+    },
+    {
+      "id": "b2-octavia",
+      "question": "Who is Octavia au Lune?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "octavia",
+          "lune"
+        ],
+        "chapters": [
+          0,
+          7,
+          11,
+          15,
+          22,
+          26,
+          28,
+          29,
+          36,
+          42,
+          47,
+          49,
+          51
+        ]
+      }
+    },
+    {
+      "id": "b2-mustang-learns",
+      "question": "What happens when Mustang learns that Darrow is a Red?",
+      "progress": 2,
+      "expect": {
+        "book": 2,
+        "keywords": [
+          "mustang",
+          "carving"
+        ],
+        "chapters": [
+          5,
+          22,
+          23,
+          33,
+          35,
+          38,
+          50
+        ]
+      }
+    },
+    {
+      "id": "b3-attica",
+      "question": "What happens at Attica?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "attica"
+        ],
+        "chapters": [
+          1,
+          4,
+          6,
+          8,
+          11,
+          12,
+          16,
+          21,
+          23
+        ]
+      }
+    },
+    {
+      "id": "b3-victra-rescue",
+      "question": "What was done to Victra while she was held prisoner?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "victra",
+          "tortured"
+        ],
+        "chapters": [
+          1,
+          4,
+          16,
+          38,
+          42,
+          48,
+          52
+        ]
+      }
+    },
+    {
+      "id": "b3-ragnar",
+      "question": "Who is Ragnar Volarus and what is a Stained?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "ragnar",
+          "stained"
+        ],
+        "chapters": [
+          7,
+          16,
+          17,
+          28,
+          29,
+          32,
+          34,
+          40,
+          41
+        ]
+      }
+    },
+    {
+      "id": "b3-holiday",
+      "question": "Who are Holiday and Trigg ti Nakamura?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "holiday",
+          "trigg"
+        ],
+        "chapters": [
+          3,
+          4,
+          5,
+          6,
+          18,
+          25,
+          26,
+          28,
+          29,
+          47,
+          53,
+          61
+        ]
+      }
+    },
+    {
+      "id": "b3-telemanus",
+      "question": "Who is Kavax au Telemanus and what is Sophocles?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "kavax",
+          "sophocles"
+        ],
+        "chapters": [
+          20,
+          36,
+          43,
+          51,
+          65
+        ]
+      }
+    },
+    {
+      "id": "b3-orion-alive",
+      "question": "What happened to Orion after the events of Golden Son?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "orion",
+          "alive"
+        ],
+        "chapters": [
+          10,
+          17,
+          18,
+          20,
+          21,
+          25,
+          35,
+          36,
+          38,
+          43,
+          48,
+          58,
+          60
+        ]
+      }
+    },
+    {
+      "id": "b3-sefi",
+      "question": "Who is Sefi the Quiet?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "sefi the quiet"
+        ],
+        "chapters": [
+          29,
+          30,
+          35
+        ]
+      }
+    },
+    {
+      "id": "b3-obsidians",
+      "question": "How do the Obsidians live, and who are the Valkyrie?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "obsidian",
+          "valkyrie"
+        ],
+        "chapters": [
+          25,
+          29,
+          30,
+          32,
+          33,
+          34,
+          35,
+          38,
+          40,
+          41,
+          43,
+          46,
+          47,
+          48
+        ]
+      }
+    },
+    {
+      "id": "b3-jackal-end",
+      "question": "How is the Jackal finally brought to trial?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "jackal",
+          "trial"
+        ],
+        "chapters": [
+          20,
+          25,
+          61
+        ]
+      }
+    },
+    {
+      "id": "b3-cassius",
+      "question": "Does Darrow forgive Cassius, and where do they end up?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "cassius",
+          "forgive"
+        ],
+        "chapters": [
+          12,
+          18,
+          36,
+          42,
+          56,
+          63
+        ]
+      }
+    },
+    {
+      "id": "b3-lysander",
+      "question": "What happens to Lysander au Lune?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "lysander"
+        ],
+        "chapters": [
+          20,
+          60,
+          61,
+          63,
+          64,
+          65
+        ]
+      }
+    },
+    {
+      "id": "b3-virginia-sovereign",
+      "question": "How does Virginia become Sovereign?",
+      "progress": 3,
+      "expect": {
+        "book": 3,
+        "keywords": [
+          "virginia",
+          "sovereign"
+        ],
+        "chapters": [
+          10,
+          17,
+          20,
+          21,
+          41,
+          42,
+          56,
+          58,
+          60,
+          64
+        ]
+      }
+    },
+    {
+      "id": "b4-lyria",
+      "question": "Who is Lyria of Lagalos and where does she live?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "lyria"
+        ],
+        "chapters": [
+          5,
+          12,
+          13,
+          17,
+          23,
+          29,
+          31,
+          35,
+          39,
+          42,
+          43,
+          44,
+          49,
+          50,
+          51,
+          57,
+          59
+        ]
+      }
+    },
+    {
+      "id": "b4-ephraim",
+      "question": "Who is Ephraim ti Horn and what does he do for a living?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "ephraim"
+        ],
+        "chapters": [
+          7,
+          14,
+          18,
+          19,
+          24,
+          42,
+          50,
+          51,
+          57,
+          58,
+          59,
+          64
+        ]
+      }
+    },
+    {
+      "id": "b4-volga",
+      "question": "Who is Volga?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "volga"
+        ],
+        "chapters": [
+          6,
+          7,
+          14,
+          18,
+          19,
+          24,
+          31,
+          39,
+          42,
+          51,
+          57,
+          58,
+          59,
+          64
+        ]
+      }
+    },
+    {
+      "id": "b4-lysander-return",
+      "question": "Where has Lysander been living, and who has been raising him?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "lysander"
+        ],
+        "chapters": [
+          2,
+          3,
+          8,
+          9,
+          15,
+          41,
+          47,
+          48,
+          55,
+          56,
+          62,
+          63
+        ]
+      }
+    },
+    {
+      "id": "b4-electra",
+      "question": "Who is Electra and what happens to her?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "electra"
+        ],
+        "chapters": [
+          2,
+          3,
+          34,
+          49,
+          58,
+          64,
+          65
+        ]
+      }
+    },
+    {
+      "id": "b4-red-hand",
+      "question": "What is the Red Hand?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "red hand"
+        ],
+        "chapters": [
+          1,
+          4,
+          5,
+          12,
+          13,
+          18,
+          27,
+          29,
+          31,
+          39,
+          43,
+          49,
+          50,
+          54,
+          56,
+          57,
+          59
+        ]
+      }
+    },
+    {
+      "id": "b4-ash-lord",
+      "question": "Who is the Ash Lord and what threat does he pose?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "ash lord",
+          "mercury"
+        ],
+        "chapters": [
+          1,
+          2,
+          5,
+          10,
+          16,
+          27,
+          30,
+          34,
+          35,
+          52,
+          60,
+          65
+        ]
+      }
+    },
+    {
+      "id": "b4-gorgo",
+      "question": "Who is Gorgo?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "gorgo"
+        ],
+        "chapters": [
+          18,
+          24,
+          31,
+          34,
+          39,
+          42,
+          46,
+          51,
+          57,
+          58
+        ]
+      }
+    },
+    {
+      "id": "b4-virginia-rule",
+      "question": "What political trouble is Virginia facing as Sovereign?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "virginia"
+        ],
+        "chapters": [
+          2,
+          4,
+          8,
+          9,
+          16,
+          21,
+          32,
+          34,
+          35,
+          44,
+          48,
+          49,
+          55,
+          60,
+          65
+        ]
+      }
+    },
+    {
+      "id": "b4-pax-son",
+      "question": "Who is Pax, Darrow's son?",
+      "progress": 4,
+      "expect": {
+        "book": 4,
+        "keywords": [
+          "pax"
+        ],
+        "chapters": [
+          2,
+          3,
+          15,
+          20,
+          21,
+          25,
+          34,
+          35,
+          39,
+          42,
+          43,
+          47,
+          49,
+          52,
+          53,
+          58,
+          61,
+          62,
+          64,
+          65
+        ]
+      }
+    },
+    {
+      "id": "b5-atalantia",
+      "question": "Who is Atalantia au Grimmus?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "atalantia",
+          "grimmus"
+        ],
+        "chapters": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          17,
+          18,
+          21,
+          35,
+          46,
+          60,
+          64,
+          75,
+          87,
+          88,
+          89
+        ]
+      }
+    },
+    {
+      "id": "b5-mercury",
+      "question": "What is happening in the siege on Mercury?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "mercury",
+          "siege"
+        ],
+        "chapters": [
+          1,
+          15,
+          19,
+          32,
+          43,
+          59
+        ]
+      }
+    },
+    {
+      "id": "b5-glirastes",
+      "question": "Who is Glirastes?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "glirastes"
+        ],
+        "chapters": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          15,
+          25,
+          30,
+          32,
+          33,
+          35,
+          42,
+          43,
+          58,
+          59,
+          61,
+          62,
+          63,
+          64,
+          78,
+          79,
+          80,
+          81,
+          82,
+          86,
+          89,
+          90,
+          92
+        ]
+      }
+    },
+    {
+      "id": "b5-kalindora",
+      "question": "Who is Kalindora and what happens to her?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "kalindora"
+        ],
+        "chapters": [
+          0,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          34,
+          38,
+          39,
+          42,
+          43,
+          59,
+          82,
+          84,
+          85,
+          87,
+          89,
+          90,
+          92
+        ]
+      }
+    },
+    {
+      "id": "b5-fear-knight",
+      "question": "Who is the Fear Knight?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "fear knight"
+        ],
+        "chapters": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          7,
+          17,
+          26,
+          32,
+          37,
+          42,
+          46,
+          55,
+          59,
+          60,
+          61,
+          62,
+          64,
+          75,
+          76,
+          79,
+          89,
+          92
+        ]
+      }
+    },
+    {
+      "id": "b5-harmony",
+      "question": "What does Harmony do to Lyria?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "harmony"
+        ],
+        "chapters": [
+          19,
+          37,
+          38,
+          39,
+          51,
+          65,
+          67,
+          68,
+          69,
+          70,
+          72,
+          73,
+          88
+        ]
+      }
+    },
+    {
+      "id": "b5-rhonna",
+      "question": "Who is Rhonna?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "rhonna"
+        ],
+        "chapters": [
+          0,
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          32,
+          35,
+          58,
+          61,
+          62,
+          78,
+          79,
+          80,
+          81,
+          86
+        ]
+      }
+    },
+    {
+      "id": "b5-ephraim-end",
+      "question": "What happens to Ephraim in Dark Age?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "ephraim"
+        ],
+        "chapters": [
+          19,
+          21,
+          22,
+          24,
+          26,
+          27,
+          36,
+          41,
+          46,
+          47,
+          49,
+          51,
+          52,
+          57,
+          65,
+          69,
+          74,
+          75,
+          88,
+          91
+        ]
+      }
+    },
+    {
+      "id": "b5-vox",
+      "question": "What is the Vox Populi?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "vox"
+        ],
+        "chapters": [
+          0,
+          18,
+          19,
+          20,
+          26,
+          29,
+          30,
+          31,
+          32,
+          33,
+          35,
+          37,
+          40,
+          43,
+          47,
+          48,
+          51,
+          53,
+          54,
+          56,
+          57,
+          61,
+          65,
+          86,
+          88,
+          91,
+          92
+        ]
+      }
+    },
+    {
+      "id": "b5-alexandar",
+      "question": "What happens to Alexandar au Arcos?",
+      "progress": 5,
+      "expect": {
+        "book": 5,
+        "keywords": [
+          "alexandar"
+        ],
+        "chapters": [
+          0,
+          1,
+          5,
+          7,
+          8,
+          9,
+          11,
+          13,
+          15,
+          17,
+          32,
+          35,
+          43,
+          53,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          78,
+          79,
+          80,
+          81,
+          82,
+          84,
+          85
+        ]
+      }
+    },
+    {
+      "id": "b6-volsung",
+      "question": "Who is Volsung Fá?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "volsung"
+        ],
+        "chapters": [
+          14,
+          16,
+          27,
+          35,
+          36,
+          39,
+          40,
+          45,
+          49,
+          50,
+          53,
+          55,
+          56,
+          64,
+          67,
+          71,
+          72,
+          73,
+          80,
+          82,
+          86
+        ]
+      }
+    },
+    {
+      "id": "b6-aurae",
+      "question": "Who is Aurae?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "aurae"
+        ],
+        "chapters": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          8,
+          9,
+          11,
+          35,
+          37,
+          39,
+          41,
+          42,
+          46,
+          48,
+          51,
+          52,
+          53,
+          56,
+          57,
+          58,
+          59,
+          60,
+          62,
+          67,
+          73,
+          77,
+          85,
+          89
+        ]
+      }
+    },
+    {
+      "id": "b6-lightbringer",
+      "question": "What is the Lightbringer?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "lightbringer"
+        ],
+        "chapters": [
+          5,
+          7,
+          10,
+          17,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32,
+          33,
+          35,
+          36,
+          39,
+          41,
+          44,
+          46,
+          50,
+          61,
+          64,
+          80,
+          82,
+          84,
+          85,
+          86,
+          87,
+          89
+        ]
+      }
+    },
+    {
+      "id": "b6-heraklion",
+      "question": "What happens at Heraklion?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "heraklion"
+        ],
+        "chapters": [
+          65,
+          66
+        ]
+      }
+    },
+    {
+      "id": "b6-skarde",
+      "question": "Who are the Skarde?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "skarde"
+        ],
+        "chapters": [
+          53,
+          54,
+          55,
+          56,
+          57,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          76,
+          77
+        ]
+      }
+    },
+    {
+      "id": "b6-lykos-stand",
+      "question": "Why does Virginia make her stand at Lykos?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "lykos"
+        ],
+        "chapters": [
+          1,
+          2,
+          8,
+          14,
+          19,
+          34,
+          37,
+          51,
+          73
+        ]
+      }
+    },
+    {
+      "id": "b6-sevro",
+      "question": "What are Sevro and the Howlers doing in Light Bringer?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "sevro",
+          "howler"
+        ],
+        "chapters": [
+          2,
+          4,
+          6,
+          11,
+          18,
+          48,
+          53,
+          76,
+          77
+        ]
+      }
+    },
+    {
+      "id": "b6-atalantia",
+      "question": "What is Atalantia's position by Light Bringer?",
+      "progress": 6,
+      "expect": {
+        "book": 6,
+        "keywords": [
+          "atalantia",
+          "grimmus"
+        ],
+        "chapters": [
+          1,
+          2,
+          5,
+          7,
+          8,
+          15,
+          16,
+          17,
+          32,
+          36,
+          38,
+          61,
+          76,
+          82,
+          89
+        ]
+      }
+    },
+    {
+      "id": "refuse-b1-victra",
+      "question": "Who is Victra au Julii?",
+      "progress": 1,
+      "refusal": {
+        "answerBook": 2,
+        "keywords": [
+          "victra"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b1-lysander",
+      "question": "Who is Lysander au Lune?",
+      "progress": 1,
+      "refusal": {
+        "answerBook": 2,
+        "keywords": [
+          "lysander"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b1-ragnar",
+      "question": "Who is Ragnar Volarus?",
+      "progress": 1,
+      "refusal": {
+        "answerBook": 3,
+        "keywords": [
+          "ragnar"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b2-lyria",
+      "question": "Who is Lyria of Lagalos?",
+      "progress": 2,
+      "refusal": {
+        "answerBook": 4,
+        "keywords": [
+          "lyria"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b2-diomedes",
+      "question": "Who is Diomedes au Raa?",
+      "progress": 2,
+      "refusal": {
+        "answerBook": 4,
+        "keywords": [
+          "diomedes"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b2-electra",
+      "question": "Who is Electra au Barca?",
+      "progress": 2,
+      "refusal": {
+        "answerBook": 4,
+        "keywords": [
+          "electra"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b3-volga",
+      "question": "Who is Volga Fjorgan?",
+      "progress": 3,
+      "refusal": {
+        "answerBook": 4,
+        "keywords": [
+          "volga"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b3-atalantia",
+      "question": "Who is Atalantia au Grimmus?",
+      "progress": 3,
+      "refusal": {
+        "answerBook": 5,
+        "keywords": [
+          "atalantia"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b3-fear-knight",
+      "question": "Who is the Fear Knight?",
+      "progress": 3,
+      "refusal": {
+        "answerBook": 4,
+        "keywords": [
+          "fear knight"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b3-ascomanni",
+      "question": "Who are the Ascomanni?",
+      "progress": 3,
+      "refusal": {
+        "answerBook": 4,
+        "keywords": [
+          "ascomanni"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b4-glirastes",
+      "question": "Who is Glirastes the Master Maker?",
+      "progress": 4,
+      "refusal": {
+        "answerBook": 5,
+        "keywords": [
+          "glirastes"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b4-kalindora",
+      "question": "Who is Kalindora au San?",
+      "progress": 4,
+      "refusal": {
+        "answerBook": 5,
+        "keywords": [
+          "kalindora"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b4-volsung",
+      "question": "Who is Volsung Fá?",
+      "progress": 4,
+      "refusal": {
+        "answerBook": 5,
+        "keywords": [
+          "volsung"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b5-heraklion",
+      "question": "What happens at Heraklion?",
+      "progress": 5,
+      "refusal": {
+        "answerBook": 6,
+        "keywords": [
+          "heraklion"
+        ]
+      }
+    },
+    {
+      "id": "refuse-b5-skarde",
+      "question": "Who are the Skarde?",
+      "progress": 5,
+      "refusal": {
+        "answerBook": 6,
+        "keywords": [
+          "skarde"
+        ]
+      }
+    }
+  ]
+}

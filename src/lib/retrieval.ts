@@ -17,6 +17,8 @@ export type RetrievalOptions = {
   rrfK?: number;
   denseWeight?: number;
   sparseWeight?: number;
+  /** Precomputed query embedding, so parameter sweeps embed each query once. */
+  queryEmbedding?: number[];
 };
 
 function envNumber(name: string, fallback: number): number {
@@ -35,8 +37,9 @@ async function denseSearch(
   maxBook: number,
   limit: number,
   matchThreshold: number,
+  precomputedEmbedding?: number[],
 ): Promise<BookChunk[]> {
-  const queryEmbedding = await generateEmbedding(query);
+  const queryEmbedding = precomputedEmbedding ?? (await generateEmbedding(query));
 
   // Hard filter: book_number must be <= maxBook (enforced in RPC)
   const { data, error } = await db.rpc("match_book_chunks", {
@@ -107,7 +110,15 @@ export async function getSpoilerFreeContext(
   const db = createServiceSupabaseClient();
 
   const [dense, sparse] = await Promise.all([
-    denseSearch(db, query, seriesId, maxBook, candidates, matchThreshold),
+    denseSearch(
+      db,
+      query,
+      seriesId,
+      maxBook,
+      candidates,
+      matchThreshold,
+      options?.queryEmbedding,
+    ),
     // Keyword search is an enhancement; if migration 003 has not been applied
     // yet, fall back to dense-only rather than failing the request.
     sparseSearch(db, query, seriesId, maxBook, candidates).catch((error) => {
