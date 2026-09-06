@@ -1,8 +1,8 @@
-import { getChatModelId, streamSpoilerFreeReply } from "@/lib/chat";
+import { getChatModelId, generateSpoilerFreeReply } from "@/lib/chat";
 import {
   CRAG_HEADER,
   SOURCES_HEADER,
-  buildCitations,
+  citationsForChunkIds,
   encodeCitations,
   encodeCragTrace,
 } from "@/lib/citations";
@@ -80,15 +80,18 @@ export async function POST(request: Request) {
       maxBookProgress,
     );
 
-    const result = await streamSpoilerFreeReply({
+    const reply = await generateSpoilerFreeReply({
       prompt,
       maxBook: maxBookProgress,
       retrievedChunks: chunks,
     });
 
-    return result.toTextStreamResponse({
+    const citations = citationsForChunkIds(chunks, reply.citedChunkIds);
+
+    return new Response(reply.text, {
       headers: {
-        [SOURCES_HEADER]: encodeCitations(buildCitations(chunks)),
+        "Content-Type": "text/plain; charset=utf-8",
+        [SOURCES_HEADER]: encodeCitations(citations),
         [CRAG_HEADER]: encodeCragTrace(trace),
       },
     });

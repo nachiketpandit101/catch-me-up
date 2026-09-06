@@ -212,7 +212,8 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-6 sm:px-6">
         <p className="mb-4 text-sm text-[var(--muted)]">
           Answers use only context from Book {currentBook.number} and earlier.
-          Nothing past your progress is retrieved.
+          Claims are cited back to retrieved chunks; nothing past your progress
+          is retrieved.
         </p>
 
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto pb-4">

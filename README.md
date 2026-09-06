@@ -77,6 +77,10 @@ After reranking, a grader node scores each passage for query relevance (`CRAG_RE
 
 Disable the graph with `CRAG_ENABLED=false`. Disable only the web fallback with `CRAG_WEB_SEARCH=false`. The retrieval eval (`npm run eval`) still calls the hybrid retriever directly, so it does not spend grader quota.
 
+### Citation grounding
+
+Every answer is generated with chunk IDs in context and must cite them inline (`[12]` or `[12, 40]`). A guardrail then parses the draft: unknown IDs are dropped, uncited claims are stripped, and if nothing grounded remains the API returns the insufficient-context refusal instead of an unmoored answer. Surviving citations are rewritten to chapter labels in the visible text. `x-sources` lists only chunks the answer actually cited.
+
 Answers cite their sources. The API returns one citation per chapter in the `x-sources` response header (base64 JSON), so the answer body stays a plain text stream and sources render before the first token arrives. Chapters found only by BM25 carry no `bestSimilarity`, which makes it easy to see when keyword search is doing the work.
 
 ## Evaluation

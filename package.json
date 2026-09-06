@@ -12,7 +12,7 @@
     "eval": "tsx scripts/eval-retrieval.ts",
     "eval:ground": "tsx scripts/eval-ground.ts",
     "list-models": "tsx scripts/list-models.ts",
-    "test": "tsx --test src/lib/crag.test.ts src/lib/web-search.test.ts"
+    "test": "tsx --test src/lib/grounding.test.ts src/lib/crag.test.ts src/lib/web-search.test.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.39",

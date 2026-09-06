@@ -15,6 +15,7 @@ export type Citation = {
   label: string;
   /** Retrieved chunks backing this chapter. */
   chunkCount: number;
+  chunkIds?: number[];
   bestSimilarity?: number;
   bestRerankScore?: number;
   source?: "corpus" | "web";
@@ -60,6 +61,7 @@ export function buildCitations(chunks: RetrievedChunk[]): Citation[] {
 
     if (existing) {
       existing.chunkCount += 1;
+      existing.chunkIds = [...(existing.chunkIds ?? []), chunk.id];
       existing.bestSimilarity = higher(existing.bestSimilarity, chunk.similarity);
       existing.bestRerankScore = higher(
         existing.bestRerankScore,
@@ -73,6 +75,7 @@ export function buildCitations(chunks: RetrievedChunk[]): Citation[] {
       chapterNumber: chunk.chapter_number,
       label: citationLabel(chunk),
       chunkCount: 1,
+      chunkIds: [chunk.id],
       bestSimilarity: chunk.similarity,
       bestRerankScore: chunk.rerankScore,
       source: chunk.source === "web" ? "web" : "corpus",
@@ -86,6 +89,14 @@ export function buildCitations(chunks: RetrievedChunk[]): Citation[] {
     }
     return a.bookNumber - b.bookNumber || a.chapterNumber - b.chapterNumber;
   });
+}
+
+export function citationsForChunkIds(
+  chunks: RetrievedChunk[],
+  citedIds: Iterable<number>,
+): Citation[] {
+  const allowed = new Set(citedIds);
+  return buildCitations(chunks.filter((chunk) => allowed.has(chunk.id)));
 }
 
 // btoa/atob rather than Buffer, so this module works on the server and in the
