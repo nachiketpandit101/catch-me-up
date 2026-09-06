@@ -1,7 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
-import type { BookChunk } from "@/lib/types";
-
+import { formatCitationLabel } from "@/lib/citations";
+import type { RetrievedChunk } from "@/lib/types";
 
 export function getChatModelId(): string {
   return process.env.GEMINI_CHAT_MODEL?.trim() || "gemini-2.5-flash";
@@ -12,17 +12,22 @@ export function getMaxOutputTokens(): number {
   return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 4096;
 }
 
+function chunkHeading(chunk: RetrievedChunk): string {
+  if (chunk.source === "web") {
+    const title = chunk.title?.trim() || "Web source";
+    return `[Web | ${title}]`;
+  }
+  return `[${formatCitationLabel(chunk.book_number, chunk.chapter_number)}]`;
+}
+
 export function buildAntiSpoilerSystemPrompt(
   maxBook: number,
-  retrievedChunks: BookChunk[],
+  retrievedChunks: RetrievedChunk[],
 ): string {
   const context =
     retrievedChunks.length > 0
       ? retrievedChunks
-          .map(
-            (c, i) =>
-              `[Chunk ${i + 1} | Book ${c.book_number}, Ch. ${c.chapter_number}]\n${c.content}`,
-          )
+          .map((chunk) => `${chunkHeading(chunk)}\n${chunk.content}`)
           .join("\n---\n")
       : "(No matching context chunks were retrieved for this question.)";
 
@@ -37,6 +42,7 @@ Strict Constraints:
 3. Do NOT use outside knowledge about future events, deaths, or twists past Book ${maxBook}.
 
 Answer style:
+- Prefer book Context Chunks over web chunks. Use web chunks only to fill gaps the books do not cover.
 - Be detailed and concrete: include names, relationships, locations, motives, and what happened in order when the context supports it.
 - Use multiple paragraphs when helpful. Prefer a thorough refresher over a one-sentence summary.
 - If several context chunks are relevant, synthesize them into one coherent explanation.
@@ -57,7 +63,7 @@ export function createChatModel() {
 export async function streamSpoilerFreeReply(options: {
   prompt: string;
   maxBook: number;
-  retrievedChunks: BookChunk[];
+  retrievedChunks: RetrievedChunk[];
 }) {
   const system = buildAntiSpoilerSystemPrompt(
     options.maxBook,

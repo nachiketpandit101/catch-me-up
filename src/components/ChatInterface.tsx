@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import type { CatalogBook, CatalogSeries } from "@/lib/catalog";
-import { SOURCES_HEADER, decodeCitations, type Citation } from "@/lib/citations";
+import { SOURCES_HEADER, CRAG_HEADER, decodeCitations, decodeCragTrace, type Citation } from "@/lib/citations";
+import type { CragTrace } from "@/lib/types";
 
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
   citations?: Citation[];
+  crag?: CragTrace | null;
 };
 
 type ChatInterfaceProps = {
@@ -103,10 +105,17 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
       // Sources arrive as a header, so they can be shown before the answer
       // finishes streaming.
       const citations = decodeCitations(response.headers.get(SOURCES_HEADER));
-      if (citations.length > 0) {
+      const crag = decodeCragTrace(response.headers.get(CRAG_HEADER));
+      if (citations.length > 0 || crag) {
         setMessages((prev) =>
           prev.map((message) =>
-            message.id === assistantId ? { ...message, citations } : message,
+            message.id === assistantId
+              ? {
+                  ...message,
+                  citations: citations.length > 0 ? citations : message.citations,
+                  crag: crag ?? message.crag,
+                }
+              : message,
           ),
         );
       }
@@ -231,20 +240,54 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
               </p>
 
               {message.role === "assistant" &&
-                message.citations &&
-                message.citations.length > 0 && (
-                  <p className="mt-3 border-t border-[var(--line)] pt-2 text-xs text-[var(--muted)]">
-                    <span className="uppercase tracking-wide">Sources:</span>{" "}
-                    {message.citations.map((citation, index) => (
-                      <span
-                        key={citation.label}
-                        title={citationDetail(citation)}
-                      >
-                        {index > 0 && " · "}
-                        {citation.label}
-                      </span>
-                    ))}
-                  </p>
+                ((message.citations && message.citations.length > 0) ||
+                  message.crag) && (
+                  <div className="mt-3 border-t border-[var(--line)] pt-2 text-xs text-[var(--muted)]">
+                    {message.citations && message.citations.length > 0 && (
+                      <p>
+                        <span className="uppercase tracking-wide">Sources:</span>{" "}
+                        {message.citations.map((citation, index) => (
+                          <span
+                            key={`${citation.label}:${citation.url ?? index}`}
+                            title={citationDetail(citation)}
+                          >
+                            {index > 0 && " · "}
+                            {citation.url ? (
+                              <a
+                                href={citation.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline decoration-[var(--line)] underline-offset-2 hover:text-[var(--ink)]"
+                              >
+                                {citation.label}
+                              </a>
+                            ) : (
+                              citation.label
+                            )}
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                    {message.crag &&
+                      (message.crag.usedExpansion ||
+                        message.crag.usedWeb ||
+                        message.crag.action === "refuse") && (
+                        <p className="mt-1">
+                          {message.crag.action === "refuse"
+                            ? "Context was too weak to ground an answer."
+                            : [
+                                message.crag.usedExpansion
+                                  ? "Re-retrieved with an expanded query"
+                                  : null,
+                                message.crag.usedWeb
+                                  ? "spoiler-filtered web fallback"
+                                  : null,
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                        </p>
+                      )}
+                  </div>
                 )}
             </div>
           ))}

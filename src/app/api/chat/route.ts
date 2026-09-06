@@ -1,14 +1,16 @@
 import { getChatModelId, streamSpoilerFreeReply } from "@/lib/chat";
 import {
+  CRAG_HEADER,
   SOURCES_HEADER,
   buildCitations,
   encodeCitations,
+  encodeCragTrace,
 } from "@/lib/citations";
-import { getSpoilerFreeContext } from "@/lib/retrieval";
+import { retrieveWithCrag } from "@/lib/crag";
 import type { ChatRequestBody } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 90;
 
 function validateBody(body: unknown): ChatRequestBody {
   if (!body || typeof body !== "object") {
@@ -72,7 +74,7 @@ export async function POST(request: Request) {
     const json = await request.json();
     const { prompt, seriesId, maxBookProgress } = validateBody(json);
 
-    const retrievedChunks = await getSpoilerFreeContext(
+    const { chunks, trace } = await retrieveWithCrag(
       prompt,
       seriesId,
       maxBookProgress,
@@ -81,12 +83,13 @@ export async function POST(request: Request) {
     const result = await streamSpoilerFreeReply({
       prompt,
       maxBook: maxBookProgress,
-      retrievedChunks,
+      retrievedChunks: chunks,
     });
 
     return result.toTextStreamResponse({
       headers: {
-        [SOURCES_HEADER]: encodeCitations(buildCitations(retrievedChunks)),
+        [SOURCES_HEADER]: encodeCitations(buildCitations(chunks)),
+        [CRAG_HEADER]: encodeCragTrace(trace),
       },
     });
   } catch (error) {

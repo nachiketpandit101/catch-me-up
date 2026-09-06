@@ -11,7 +11,8 @@
     "ingest:books": "tsx scripts/ingest.ts red-rising 3 4 5 6",
     "eval": "tsx scripts/eval-retrieval.ts",
     "eval:ground": "tsx scripts/eval-ground.ts",
-    "list-models": "tsx scripts/list-models.ts"
+    "list-models": "tsx scripts/list-models.ts",
+    "test": "tsx --test src/lib/crag.test.ts src/lib/web-search.test.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.39",

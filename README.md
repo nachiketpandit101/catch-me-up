@@ -66,6 +66,17 @@ Reranking is best-effort: a provider error or a timeout past `RERANK_TIMEOUT_MS`
 
 If migration `003` has not been applied, sparse retrieval is skipped and the app falls back to dense-only.
 
+### Corrective RAG
+
+After reranking, a grader node scores each passage for query relevance (`CRAG_RELEVANCE_THRESHOLD`, default 0.5). Mean confidence of the relevant set is compared to `CRAG_CONFIDENCE_THRESHOLD` (default 0.55):
+
+1. **Use** — keep only relevant chunks and generate.
+2. **Expand** — rewrite the question into 1–3 retrieval queries, re-retrieve, merge, and grade again.
+3. **Web search** — last resort when expansion still finds **no** relevant book passages. Tavily is used when `TAVILY_API_KEY` is set; otherwise Gemini Google Search. Results that name a later book title are dropped before they can enter context, and the grader also rejects later-plot passages. Book chunks always outrank web snippets in the prompt.
+4. **Refuse** — if confidence is still low, the model is not given those passages.
+
+Disable the graph with `CRAG_ENABLED=false`. Disable only the web fallback with `CRAG_WEB_SEARCH=false`. The retrieval eval (`npm run eval`) still calls the hybrid retriever directly, so it does not spend grader quota.
+
 Answers cite their sources. The API returns one citation per chapter in the `x-sources` response header (base64 JSON), so the answer body stays a plain text stream and sources render before the first token arrives. Chapters found only by BM25 carry no `bestSimilarity`, which makes it easy to see when keyword search is doing the work.
 
 ## Evaluation
