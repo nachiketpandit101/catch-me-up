@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { searchSeries, type CatalogSeries } from "@/lib/catalog";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 function SeriesSpine({ series }: { series: CatalogSeries }) {
   return (
@@ -76,7 +78,19 @@ function ShelfRow({ series }: { series: CatalogSeries[] }) {
 
 export function LibraryHome() {
   const [query, setQuery] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const results = useMemo(() => searchSeries(query), [query]);
+
+  useEffect(() => {
+    const supabase = createBrowserSupabaseClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createBrowserSupabaseClient();
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  }
 
   return (
     <div className="relative flex min-h-full flex-1 flex-col overflow-hidden">
@@ -93,9 +107,19 @@ export function LibraryHome() {
         <p className="font-[family-name:var(--font-display)] text-xl tracking-tight text-[var(--ink)] sm:text-2xl">
           Catch Me Up
         </p>
-        <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted)]">
-          Spoiler-free shelves
-        </p>
+        <div className="flex items-center gap-3">
+          {user && (
+            <span className="hidden text-xs text-[var(--muted)] sm:inline">
+              {user.email}
+            </span>
+          )}
+          <button
+            onClick={handleSignOut}
+            className="rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--muted)] transition hover:border-[var(--accent)] hover:text-[var(--ink)]"
+          >
+            Sign out
+          </button>
+        </div>
       </header>
 
       <main className="relative z-[1] mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 pb-16 pt-10 sm:px-8 sm:pt-14">

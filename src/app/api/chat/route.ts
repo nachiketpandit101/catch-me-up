@@ -7,6 +7,8 @@ import {
   encodeCragTrace,
 } from "@/lib/citations";
 import { retrieveWithCrag } from "@/lib/crag";
+import { checkRateLimit, consumeRateLimit } from "@/lib/rate-limit";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ChatRequestBody } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -71,6 +73,40 @@ function formatApiError(error: unknown): { message: string; status: number } {
 
 export async function POST(request: Request) {
   try {
+    // --- Auth guard ---
+    const supabase = await createServerSupabaseClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return Response.json(
+        { error: "Authentication required. Please sign in." },
+        { status: 401 },
+      );
+    }
+
+    // --- Rate limit guard ---
+    const rateCheck = await checkRateLimit(user.id);
+    if (!rateCheck.allowed) {
+      return Response.json(
+        {
+          error: rateCheck.reason,
+          retryAfterSeconds: rateCheck.retryAfterSeconds,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateCheck.retryAfterSeconds ?? 60),
+          },
+        },
+      );
+    }
+
+    // --- Consume one rate-limit slot ---
+    await consumeRateLimit(user.id);
+
     const json = await request.json();
     const { prompt, seriesId, maxBookProgress } = validateBody(json);
 

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { CatalogBook, CatalogSeries } from "@/lib/catalog";
 import { SOURCES_HEADER, CRAG_HEADER, decodeCitations, decodeCragTrace, type Citation } from "@/lib/citations";
 import type { CragTrace } from "@/lib/types";
@@ -32,6 +33,7 @@ function citationDetail(citation: Citation): string {
 }
 
 export function ChatInterface({ series }: ChatInterfaceProps) {
+  const router = useRouter();
   const storageKey = `catch-me-up:maxBookProgress:${series.id}`;
   const [maxBookProgress, setMaxBookProgress] = useState(
     series.books[series.books.length - 1]?.number ?? 1,
@@ -40,6 +42,7 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,6 +62,19 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
+
+  // Countdown timer for rate limiting
+  useEffect(() => {
+    if (retryCountdown === null || retryCountdown <= 0) {
+      if (retryCountdown === 0) {
+        setRetryCountdown(null);
+        setError(null);
+      }
+      return;
+    }
+    const timer = setTimeout(() => setRetryCountdown((c) => (c ?? 1) - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [retryCountdown]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -94,7 +110,18 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as {
           error?: string;
+          retryAfterSeconds?: number;
         } | null;
+
+        if (response.status === 401) {
+          router.push("/login");
+          return;
+        }
+
+        if (response.status === 429 && payload?.retryAfterSeconds) {
+          setRetryCountdown(payload.retryAfterSeconds);
+        }
+
         throw new Error(payload?.error ?? `Request failed (${response.status})`);
       }
 
@@ -296,9 +323,14 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
         </div>
 
         {error && (
-          <p className="mb-3 rounded-md border border-red-800/40 bg-red-950/30 px-3 py-2 text-sm text-red-200">
-            {error}
-          </p>
+          <div className="mb-3 rounded-md border border-red-800/40 bg-red-950/30 px-3 py-2 text-sm text-red-200">
+            <p>{error}</p>
+            {retryCountdown !== null && retryCountdown > 0 && (
+              <p className="mt-1 text-xs text-red-300/80">
+                You can try again in {retryCountdown}s
+              </p>
+            )}
+          </div>
         )}
 
         <form
@@ -314,7 +346,7 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
           />
           <button
             type="submit"
-            disabled={isStreaming || !prompt.trim()}
+            disabled={isStreaming || !prompt.trim() || (retryCountdown !== null && retryCountdown > 0)}
             aria-label="Send message"
             className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
           >

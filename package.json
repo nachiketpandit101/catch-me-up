@@ -17,6 +17,7 @@
   "dependencies": {
     "@ai-sdk/google": "^4.0.39",
     "@google/genai": "^2.16.0",
+    "@supabase/ssr": "^0.12.6",
     "@supabase/supabase-js": "^2.112.2",
     "ai": "^7.0.58",
     "dotenv": "^17.4.2",
