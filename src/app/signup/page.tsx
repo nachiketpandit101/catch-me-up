@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -30,14 +28,38 @@ export default function SignupPage() {
         return;
       }
 
-      // No email verification — go straight to home
-      router.push("/");
-      router.refresh();
+      setSubmitted(true);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (submitted) {
+    return (
+      <div className="flex min-h-full flex-1 items-center justify-center px-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-[var(--accent)]/15 text-2xl">
+            ✉️
+          </div>
+          <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-[var(--ink)]">
+            Check your email
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
+            We sent a confirmation link to{" "}
+            <span className="text-[var(--ink)]">{email}</span>. Click the link
+            to activate your account, then come back to sign in.
+          </p>
+          <Link
+            href="/login"
+            className="mt-6 inline-block rounded-md bg-[var(--accent)] px-5 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition hover:brightness-110"
+          >
+            Back to sign in
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
