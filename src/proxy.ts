@@ -39,24 +39,29 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If not authenticated and trying to access a protected route, redirect to login.
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup") ||
-    request.nextUrl.pathname.startsWith("/auth");
+  const { pathname } = request.nextUrl;
 
-  if (!user && !isAuthPage) {
+  const isAuthPage =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/auth");
+
+  // The marketing landing page is reachable without an account.
+  const isPublicPage = pathname === "/" || isAuthPage;
+
+  if (!user && !isPublicPage) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
+    loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // If authenticated and visiting an auth page, redirect to home.
+  // If authenticated and visiting an auth page, redirect to the library.
   if (user && isAuthPage) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/";
-    return NextResponse.redirect(homeUrl);
+    const libraryUrl = request.nextUrl.clone();
+    libraryUrl.pathname = "/library";
+    libraryUrl.search = "";
+    return NextResponse.redirect(libraryUrl);
   }
 
   return supabaseResponse;
@@ -69,8 +74,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization)
      * - favicon.ico
+     * - generated metadata routes (crawlers must reach these without a session)
      * - public assets
      */
-    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|opengraph-image|twitter-image|icon|apple-icon|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

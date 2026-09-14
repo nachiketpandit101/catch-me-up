@@ -12,9 +12,29 @@ const body = Source_Sans_3({
   subsets: ["latin"],
 });
 
+const description =
+  "Ask anything about the series you're reading and get answers drawn only from the books you've actually finished — cited to the chapter, with a hard stop at your spoiler line.";
+
 export const metadata: Metadata = {
-  title: "Catch Me Up",
-  description: "Spoiler-free book series catch-up assistant",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  title: {
+    default: "Catch Me Up — spoiler-free catch-ups for book series",
+    template: "%s · Catch Me Up",
+  },
+  description,
+  openGraph: {
+    title: "Catch Me Up — spoiler-free catch-ups for book series",
+    description,
+    siteName: "Catch Me Up",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Catch Me Up",
+    description,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

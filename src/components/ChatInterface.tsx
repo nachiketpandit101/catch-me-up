@@ -203,7 +203,7 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
           <div>
             <Link
-              href="/"
+              href="/library"
               className="text-xs uppercase tracking-[0.16em] text-[var(--muted)] transition hover:text-[var(--ink)]"
             >
               ← Library

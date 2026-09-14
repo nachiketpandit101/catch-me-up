@@ -89,7 +89,7 @@ export function LibraryHome() {
   async function handleSignOut() {
     const supabase = createBrowserSupabaseClient();
     await supabase.auth.signOut();
-    window.location.href = "/login";
+    window.location.href = "/";
   }
 
   return (
@@ -104,9 +104,12 @@ export function LibraryHome() {
       />
 
       <header className="relative z-[1] mx-auto flex w-full max-w-5xl items-center justify-between px-5 pt-6 sm:px-8">
-        <p className="font-[family-name:var(--font-display)] text-xl tracking-tight text-[var(--ink)] sm:text-2xl">
+        <Link
+          href="/"
+          className="font-[family-name:var(--font-display)] text-xl tracking-tight text-[var(--ink)] transition hover:text-[var(--accent)] sm:text-2xl"
+        >
           Catch Me Up
-        </p>
+        </Link>
         <div className="flex items-center gap-3">
           {user && (
             <span className="hidden text-xs text-[var(--muted)] sm:inline">
