@@ -183,8 +183,9 @@ export function SpoilerLine({ books }: { books: CatalogBook[] }) {
           {lockedCount > 0 ? (
             <>
               <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-                Based on your progress up to Book {progress}, this event has not
-                occurred yet or is not mentioned.
+                I couldn&apos;t find that in the books you&apos;ve read through
+                Book {progress}. If it hasn&apos;t come up yet, I won&apos;t
+                spoil it.
               </p>
               <p className="mt-3 border-t border-[var(--line)] pt-2 text-[0.7rem] text-[var(--muted)]">
                 0 passages retrieved from Books {progress + 1}–{lastBook}

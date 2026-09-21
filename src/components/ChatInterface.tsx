@@ -297,22 +297,18 @@ export function ChatInterface({ series }: ChatInterfaceProps) {
                       </p>
                     )}
                     {message.crag &&
-                      (message.crag.usedExpansion ||
-                        message.crag.usedWeb ||
-                        message.crag.action === "refuse") && (
+                      (message.crag.usedExpansion || message.crag.usedWeb) && (
                         <p className="mt-1">
-                          {message.crag.action === "refuse"
-                            ? "Context was too weak to ground an answer."
-                            : [
-                                message.crag.usedExpansion
-                                  ? "Re-retrieved with an expanded query"
-                                  : null,
-                                message.crag.usedWeb
-                                  ? "spoiler-filtered web fallback"
-                                  : null,
-                              ]
-                                .filter(Boolean)
-                                .join(" · ")}
+                          {[
+                            message.crag.usedExpansion
+                              ? "Looked again with a broader search"
+                              : null,
+                            message.crag.usedWeb
+                              ? "Checked an outside source, still cut off at your last book"
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </p>
                       )}
                   </div>

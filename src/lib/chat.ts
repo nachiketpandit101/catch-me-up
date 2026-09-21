@@ -4,6 +4,8 @@ import { formatCitationLabel } from "@/lib/citations";
 import {
   enforceGrounding,
   insufficientContextMessage,
+  isUnclearQuestion,
+  unclearQuestionMessage,
 } from "@/lib/grounding";
 import type { RetrievedChunk } from "@/lib/types";
 
@@ -43,8 +45,11 @@ Answer the user's question strictly using ONLY the provided Context Chunks below
 
 Strict Constraints:
 1. The user has read up to Book ${maxBook}.
-2. If the answer cannot be verified from the provided context, reply exactly:
-   "${insufficientContextMessage(maxBook)}"
+2. If you cannot answer, reply with exactly one of these two lines and nothing else:
+   - If the user's message is nonsense, gibberish, random characters, or not a real question about the story:
+     "${unclearQuestionMessage()}"
+   - If the question is clear but the Context Chunks do not contain the answer:
+     "${insufficientContextMessage(maxBook)}"
 3. Do NOT use outside knowledge about future events, deaths, or twists past Book ${maxBook}.
 
 Citation rules:
@@ -100,7 +105,9 @@ export async function generateSpoilerFreeReply(options: {
 }): Promise<GroundedReply> {
   if (options.retrievedChunks.length === 0) {
     return {
-      text: insufficientContextMessage(options.maxBook),
+      text: isUnclearQuestion(options.prompt)
+        ? unclearQuestionMessage()
+        : insufficientContextMessage(options.maxBook),
       citedChunkIds: [],
       grounded: false,
     };
@@ -127,7 +134,9 @@ export async function generateSpoilerFreeReply(options: {
         ? `These IDs are not in the context: ${grounded.unknownIds.join(", ")}.`
         : "One or more sentences had no valid chunk citations.",
       "Rewrite the answer so every factual sentence cites a valid [chunk id].",
-      `If you cannot, reply exactly: "${insufficientContextMessage(options.maxBook)}"`,
+      "If you cannot, reply with exactly one of these two lines and nothing else:",
+      `- Nonsense or not a real question: "${unclearQuestionMessage()}"`,
+      `- Clear question, but not in the context: "${insufficientContextMessage(options.maxBook)}"`,
     ].join("\n");
 
     raw = await generateOnce(retryPrompt, system);

@@ -7,6 +7,7 @@ import {
   encodeCragTrace,
 } from "@/lib/citations";
 import { retrieveWithCrag } from "@/lib/crag";
+import { isUnclearQuestion, unclearQuestionMessage } from "@/lib/grounding";
 import { checkRateLimit, consumeRateLimit } from "@/lib/rate-limit";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ChatRequestBody } from "@/lib/types";
@@ -109,6 +110,15 @@ export async function POST(request: Request) {
 
     const json = await request.json();
     const { prompt, seriesId, maxBookProgress } = validateBody(json);
+
+    if (isUnclearQuestion(prompt)) {
+      return new Response(unclearQuestionMessage(), {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          [SOURCES_HEADER]: encodeCitations([]),
+        },
+      });
+    }
 
     const { chunks, trace } = await retrieveWithCrag(
       prompt,

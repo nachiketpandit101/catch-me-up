@@ -4,7 +4,9 @@ import {
   enforceGrounding,
   extractCitedIds,
   insufficientContextMessage,
+  isUnclearQuestion,
   parseCitationIds,
+  unclearQuestionMessage,
 } from "./grounding";
 import type { RetrievedChunk } from "./types";
 
@@ -113,6 +115,24 @@ describe("enforceGrounding", () => {
     assert.equal(result.text, insufficientContextMessage(2));
   });
 
+  it("accepts an unclear-question refusal without citations", () => {
+    const result = enforceGrounding(unclearQuestionMessage(), corpus, 2);
+    assert.equal(result.ok, true);
+    assert.equal(result.refused, true);
+    assert.equal(result.grounded, false);
+    assert.equal(result.text, unclearQuestionMessage());
+  });
+
+  it("rewrites the old not-found phrasing to the current refusal", () => {
+    const result = enforceGrounding(
+      "Based on your progress up to Book 2, this event has not occurred yet or is not mentioned.",
+      corpus,
+      2,
+    );
+    assert.equal(result.refused, true);
+    assert.equal(result.text, insufficientContextMessage(2));
+  });
+
   it("cites web fallback chunks by title", () => {
     const web = chunk(-1, 0, 0, {
       source: "web",
@@ -127,5 +147,25 @@ describe("enforceGrounding", () => {
     assert.equal(result.ok, true);
     assert.match(result.text, /Web: Red Rising wiki/);
     assert.deepEqual(result.citedIds, [-1]);
+  });
+});
+
+describe("isUnclearQuestion", () => {
+  it("flags keyboard mash and empty noise", () => {
+    assert.equal(isUnclearQuestion("djoiwj sijows"), true);
+    assert.equal(isUnclearQuestion("asdfgh qwerty"), true);
+    assert.equal(isUnclearQuestion("???"), true);
+  });
+
+  it("lets through real questions and name lookups", () => {
+    assert.equal(isUnclearQuestion("Who is Darrow?"), false);
+    assert.equal(
+      isUnclearQuestion("What happens to Darrow in the last book?"),
+      false,
+    );
+    assert.equal(isUnclearQuestion("Sevro"), false);
+    assert.equal(isUnclearQuestion("Sevro Mustang"), false);
+    assert.equal(isUnclearQuestion("Eo"), false);
+    assert.equal(isUnclearQuestion("Tell me about the Institute"), false);
   });
 });
